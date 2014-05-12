@@ -57,38 +57,55 @@ public function index()
 	}
 
 	public function members(){
-		$data['title']="Members page";
-		$data['page_header']='Members page';
-		$this->load->view('members_view',$data);
+				if ($this->session->userdata('is_logged_in')){
+				$data['title']="Members page";
+				$data['page_header']='Members page';
+				$this->load->view('members_view',$data);
+			}else{
+		      redirect ('main/restricted');	
+			}
 	}
 
-	public function checkLogin()
-	{
+	public function restricted(){
+			$this->load->view('restricted_view');
+	}
+
+
+	public function checkLogin(){
 		$this->load->library('form_validation');
 		$this->form_validation->set_rules('email', 'Email', 'required|trim|xss_clean|callback_validate_credentials');		
 		$this->form_validation->set_rules('password', 'Password', 'required|md5|trim');
-		
 		if($this->form_validation->run())	{
-			$data = array(
+				$data = array(
 						'email' => $this->input->post('email'),
 						'is_logged_in' => 1			
 				);
 			$this->session->set_userdata($data);
-				redirect('main/members');
-		}	else{
+			redirect('main/members');
+		   }else{
 			   $this->login();					
-		}
+		   }
 	}
 
 public function validate_credentials(){
 	  $this->load->model('User_model');	  
 	  if ($this->User_model->can_log_in()){
 	          return true;	
-	}else{
+     }else{
 			    $this->form_validation->set_message('validate_credentials', 'Incorrect email/password.');
 			    return false;
-    }
+            }
    }
+
+public function logout(){
+	$this->session->sess_destroy();
+	redirect('main/login');
+
+
+}
+
+
+
 }
 /* End of file main.php */
 /* Location: ./application/controllers/main.php */
