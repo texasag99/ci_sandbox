@@ -23,4 +23,7 @@ class User_model extends CI_Model {
 			}		
 	}	
 	
+	public function register_new_user(){
+	}
+	
 	}

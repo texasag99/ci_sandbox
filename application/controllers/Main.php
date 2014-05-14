@@ -44,16 +44,30 @@ class Main extends CI_Controller {
 	 * map to /index.php/welcome/<method_name>
 	 * @see http://codeigniter.com/user_guide/general/urls.html
 	 */
-public function index()
-	{
+public function index(){
 		$this->login();
 	}
 
-	public function login()
-	{
+	public function login(){
 		$data['title']='Login';
 		$data['page_header']='Login';
 		$this->load->view('login_view',$data);
+	}
+
+	public function login_validation(){
+		$this->load->library('form_validation');
+		$this->form_validation->set_rules('email', 'Email', 'required|trim|xss_clean|callback_validate_credentials');		
+		$this->form_validation->set_rules('password', 'Password', 'required|md5|trim');
+		if($this->form_validation->run())	{
+				$data = array(
+						'email' => $this->input->post('email'),
+						'is_logged_in' => 1			
+				);
+			$this->session->set_userdata($data);
+			redirect('main/members');
+		   }else{
+			   $this->login();					
+		   }
 	}
 
 	public function members(){
@@ -70,32 +84,50 @@ public function index()
 			$this->load->view('restricted_view');
 	}
 
+public function registration(){
+	$data['title']="Site Registration";
+	$data['page_header']="Site Registration";
+	$this->load->view('registration_view',$data);
+}
 
-	public function checkLogin(){
-		$this->load->library('form_validation');
-		$this->form_validation->set_rules('email', 'Email', 'required|trim|xss_clean|callback_validate_credentials');		
-		$this->form_validation->set_rules('password', 'Password', 'required|md5|trim');
-		if($this->form_validation->run())	{
-				$data = array(
-						'email' => $this->input->post('email'),
-						'is_logged_in' => 1			
-				);
-			$this->session->set_userdata($data);
-			redirect('main/members');
-		   }else{
-			   $this->login();					
-		   }
-	}
+public function registration_validation(){
+			$this->load->library('form_validation');
+			$this->form_validation->set_rules('email', 'Email', 'required|trim|valid_email|is_unique[user.email]');
+			$this->form_validation->set_rules('password', 'Password', 'required|trim');
+			$this->form_validation->set_rules('confirm_password','Confirm Password', 'required|trim|matches[password]');
+			$this->form_validation->set_message('is_unique',"The user already exists.");
+			if ($this->form_validation->run()){
+					    //generate a random key
+						$key = md5(uniqid());
+						   //send and email to the user
+						$this->load->library('email');
+						$this->email->from('bejan.nouri@gmail.com',"Bejan Nouri");
+						$this->email->to($this->input->post('email'))	;
+						$this->email->subject('Confirm your account!');
+						$message = "<p>Thank you for signing up</p>";
+						$message .= "<p><a href='".base_url()."main/confirm_registration/$key'>Click Here</a> to confirm 
+						your account.</p>";		    
+						$this->email->message($message);
+						if ($this->email->send()){
+									echo "The email has been sent!";
+								}else{ 
+									echo "The email failed to send.";
+								}			 
+			 	      //add them to the temp_users db
+			}else{
+						$this->registration();
+			}
+}
 
 public function validate_credentials(){
-	  $this->load->model('User_model');	  
-	  if ($this->User_model->can_log_in()){
-	          return true;	
-     }else{
-			    $this->form_validation->set_message('validate_credentials', 'Incorrect email/password.');
-			    return false;
-            }
-   }
+		  $this->load->model('User_model');	  
+		  if ($this->User_model->can_log_in()){
+		          return true;	
+	     }else{
+				    $this->form_validation->set_message('validate_credentials', 'Incorrect email/password.');
+				    return false;
+	            }
+ }
 
 public function logout(){
 	$this->session->sess_destroy();
@@ -103,7 +135,6 @@ public function logout(){
 
 
 }
-
 
 
 }
