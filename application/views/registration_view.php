@@ -4,12 +4,13 @@
 	<h1><?php echo $page_header; ?></h1>
 
 	<div id="body">
+	<a href="<?php echo base_url().'/User/login';?>">Go Back!</a>
 	 <h3>Please enter a valid email and password!</h3>
 	 <p style="max-width:800px; border:1px solid dark-gray; background-color:silver; padding:10px;">
      Please register here. </p>
 <table><tbody>
 <?php 
-echo form_open('main/registration_validation');
+echo form_open('User/registration_validation');
 
 echo '<tr><td></td><td><div style="color:red;">'.validation_errors().'</div></td></tr>';
 

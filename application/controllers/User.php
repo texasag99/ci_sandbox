@@ -64,7 +64,7 @@ public function index(){
 						'is_logged_in' => 1			
 				);
 			$this->session->set_userdata($data);
-			redirect('user/members');
+			redirect('User/members');
 		   }else{
 			   $this->login();					
 		   }
@@ -76,7 +76,7 @@ public function index(){
 				$data['page_header']='Members page';
 				$this->load->view('members_view',$data);
 			}else{
-		      redirect ('user/restricted');	
+		      redirect ('User/restricted');	
 			}
 	}
 
@@ -92,7 +92,7 @@ public function registration(){
 
 public function registration_validation(){
 			$this->load->library('form_validation');
-			$this->form_validation->set_rules('email', 'Email', 'required|trim|valid_email|is_unique[user.email]');
+			$this->form_validation->set_rules('email', 'Email', 'required|trim|valid_email|is_unique[user.email]|is_unique[temp_user.email]');
 			$this->form_validation->set_rules('password', 'Password', 'required|trim');
 			$this->form_validation->set_rules('confirm_password','Confirm Password', 'required|trim|matches[password]');
 			$this->form_validation->set_message('is_unique',"The user already exists.");
@@ -105,7 +105,7 @@ public function registration_validation(){
 						$this->email->to($this->input->post('email'))	;
 						$this->email->subject('Confirm your account!');
 						$message = "<p>Thank you for signing up</p>";
-						$message .= "<p><a href='".base_url()."user/confirm_registration/$key'>Click Here</a> to confirm 
+						$message .= "<p><a href='".base_url()."User/confirm_registration/$key'>Click Here</a> to confirm 
 						your account.</p>";		    
 						$this->email->message($message);
 						if ($this->email->send()){
@@ -113,12 +113,15 @@ public function registration_validation(){
 								}else{ 
 									 echo "The email failed to send. Please notify the system administrator.";
 								}			 
-			 	      //add them to the temp_users db
+			 	      
 			}else{
 						$this->registration();
 			}
 }
 
+public function confirm_registration($key){
+
+}
 public function validate_credentials(){
 		  $this->load->model('User_model');	  
 		  if ($this->User_model->can_log_in()){
@@ -131,7 +134,7 @@ public function validate_credentials(){
 
 public function logout(){
 	$this->session->sess_destroy();
-	redirect('user/login');
+	redirect('User/login');
 
 
 }
