@@ -14,6 +14,14 @@ echo form_open('User/registration_validation');
 
 echo '<tr><td></td><td><div style="color:red;">'.validation_errors().'</div></td></tr>';
 
+echo "<tr><td style='text-align:right;'>First Name:</td><td> ";
+echo form_input('first');
+echo "</td></tr>";
+
+echo "<tr><td style='text-align:right;'>Last Name:</td><td> ";
+echo form_input('last');
+echo "</td></tr>";
+
 echo "<tr><td style='text-align:right;'>Email:</td><td> ";
 echo form_input('email');
 echo "</td></tr>";

@@ -44,6 +44,22 @@ class User extends CI_Controller {
 	 * map to /index.php/welcome/<method_name>
 	 * @see http://codeigniter.com/user_guide/general/urls.html
 	 */
+
+	/**
+	 * Index Page for this controller.
+	 *
+	 * Maps to the following URL
+	 * 		http://example.com/index.php/welcome
+	 *	- or -  
+	 * 		http://example.com/index.php/welcome/index
+	 *	- or -
+	 * Since this controller is set as the default controller in 
+	 * config/routes.php, it's displayed at http://example.com/
+	 *
+	 * So any other public methods not prefixed with an underscore will
+	 * map to /index.php/welcome/<method_name>
+	 * @see http://codeigniter.com/user_guide/general/urls.html
+	 */
 public function index(){
 		$this->login();
 	}
@@ -92,6 +108,8 @@ public function registration(){
 
 public function registration_validation(){
 			$this->load->library('form_validation');
+			$this->form_validation->set_rules('first', 'First Name', 'required|trim');
+			$this->form_validation->set_rules('last', 'Last Name', 'required|trim');			
 			$this->form_validation->set_rules('email', 'Email', 'required|trim|valid_email|is_unique[user.email]|is_unique[temp_user.email]');
 			$this->form_validation->set_rules('password', 'Password', 'required|trim');
 			$this->form_validation->set_rules('confirm_password','Confirm Password', 'required|trim|matches[password]');
@@ -112,7 +130,17 @@ public function registration_validation(){
 									echo "The email has been sent!";
 								}else{ 
 									 echo "The email failed to send. Please notify the system administrator.";
-								}			 
+								}	
+						$this->load->model('User_model');
+						$data = array(
+								'email'=>$this->input->post('email'),
+								'temp_key'=>$key
+						);
+						if($this->User_model->register_new_user($data)){
+							echo "New user data was inserted correctly";
+						}else{
+							echo "There is a problem inserting the new user information in the database";
+						}	 
 			 	      
 			}else{
 						$this->registration();
@@ -120,15 +148,26 @@ public function registration_validation(){
 }
 
 public function confirm_registration($key){
+	echo "You are confirmed";
 
 }
 public function validate_credentials(){
 		  $this->load->model('User_model');	  
 		  if ($this->User_model->can_log_in()){
-		          return true;	
+		      if($this->User_model->is_active()){
+		      	if($this->User_model->is_unlocked()){
+		      		return true;
+		      	}else{
+		      		$this->form_validation->set_message('validate_credentials','User is locked.');
+		      		return false;
+		      	}
+		      }else{
+		      	$this->form_validation->set_message('validate_credentials','User has not been activated.');
+		      	return false;
+		      }
 	     }else{
-				    $this->form_validation->set_message('validate_credentials', 'Incorrect email/password.');
-				    return false;
+		     $this->form_validation->set_message('validate_credentials', 'Invalid email/password.');
+			  return false;
 	     }
  }
 
