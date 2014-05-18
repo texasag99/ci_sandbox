@@ -17,13 +17,21 @@ class User_model extends CI_Model {
 		$query = $this->db->get('user');		
 		if($query->num_rows() == 1){
 			return true;
-			}
-		else{
+			}else{
 			return false;
 			}		
 	}	
 	
-	public function register_new_user(){
+	public function register_new_user($data){
+         $this->db->insert('temp_user', $data);
+         if($query->num_rows() == 1){
+	         return true;
+	         }else{
+				return false;         
+	         }
 	}
-	
-	}
+
+
+
+
+}
