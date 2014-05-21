@@ -4,7 +4,7 @@
 	<h1><?php echo $page_header; ?></h1>
 
 	<div id="body">
-	<a href='<?php echo base_url()."User/registration"; ?>'>Site Registration</a>
+	<a href='<?php echo base_url()."User/registration"; ?>'>Register</a>
 	 <h3>Please enter your email and password!</h3>
 	 <p style="max-width:800px; border:1px solid dark-gray; background-color:silver; padding:10px;">
      Please login here. </p>

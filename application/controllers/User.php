@@ -97,7 +97,11 @@ public function index(){
 	}
 
 public function restricted(){
-			$this->load->view('restricted_view');
+			$this->session->sess_destroy();//if the user attempts to access a restricted area...destroy the session
+	      $data['title']="There is a problem!";
+	      $data['page_header']="There is a problem!";
+	      $data['error_message']="<span style='color:red; font-size:2em; font-weight:bold;'>Restricted Access!</span><br><br>You have attempted to access an area that is restricted.";
+			$this->load->view('There_is_a_problem_view',$data);
 	}
 
 public function registration(){
@@ -117,7 +121,7 @@ public function registration_validation(){
 			if ($this->form_validation->run()){
 					    //generate a random key
 						$key = md5(uniqid());
-						   //send and email to the user
+						   //add the user info to the db, build the email and send and email to the new user
 						$this->load->library('email');
 						$this->email->from('bejan.nouri@gmail.com',"Bejan Nouri");
 						$this->email->to($this->input->post('email'))	;
@@ -125,32 +129,44 @@ public function registration_validation(){
 						$message = "<p>Thank you for signing up</p>";
 						$message .= "<p><a href='".base_url()."User/confirm_registration/$key'>Click Here</a> to confirm 
 						your account.</p>";		    
-						$this->email->message($message);
-						if ($this->email->send()){
-									echo "The email has been sent!";
-								}else{ 
-									 echo "The email failed to send. Please notify the system administrator.";
-								}	
+						$this->email->message($message);						
 						$this->load->model('User_model');
 						$data = array(
 								'email'=>$this->input->post('email'),
 								'temp_key'=>$key
 						);
 						if($this->User_model->register_new_user($data)){
-							echo "New user data was inserted correctly";
+							if ($this->email->send()){
+									echo "The user has been successfully entered and an email has been sent!";
+								}else{ 
+									 echo "The email failed to send. Please notify the system administrator.";
+								}	
 						}else{
 							echo "There is a problem inserting the new user information in the database";
 						}	 
-			 	      
-			}else{
+			   }else{ //Else if the form is not valid...they didn't enter a field properly or user already exists. Then reload the registration page with the errors.
 						$this->registration();
 			}
 }
 
 public function confirm_registration($key){
-	echo "You are confirmed";
-
+	$this->load->model('User_model');
+	if ($this->User_model->confirm_key($key)){
+		if ($this->User_model->activate_new_user($key)){
+			$data['title']="User Activated!";
+			$data['page_header']="You have successfully activated your account!"	;		
+			$this->load->view('user_activated_view',$data);		
+		}else {
+			   $error = "<div id='error'>There is a problem with activating the new user. Please contact the system administrator</div>";
+				$this->error_message($error);
+		}
+	} else{
+	         $error = "<div id='error'>There is a problem with the URL. Please make sure you do not modify the URL link you received in the 
+	         email. Otherwise, please contact the system administrator for assistance.</div>";
+				$this->error_message($error);
+			} 
 }
+
 public function validate_credentials(){
 		  $this->load->model('User_model');	  
 		  if ($this->User_model->can_log_in()){
@@ -169,6 +185,13 @@ public function validate_credentials(){
 		     $this->form_validation->set_message('validate_credentials', 'Invalid email/password.');
 			  return false;
 	     }
+ }
+ 
+ public function error_message($error){
+         $data['title']="There is a problem!";
+	      $data['page_header']="There is a problem!";
+	      $data['error_message']= $error;
+			$this->load->view('There_is_a_problem_view',$data); 
  }
 
 public function logout(){

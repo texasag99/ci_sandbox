@@ -65,8 +65,34 @@ public function register_new_user($data){
 	         }
 	}
 
-public function activate_new_user(){
-	
+public function confirm_key($key){
+		$this->db->where('temp_key', $key);
+		$query = $this->db->get('temp_user');		
+		if($query->num_rows() == 1){
+			return true;
+			}else{
+			return false;
+			}	
+}
+
+public function activate_new_user($key){
+	$this->db->where('temp_key',$key);
+	$query = $this->db->get('temp_user');
+	foreach($query->result() as $row)
+	{
+		$email = $row->email;
+	}
+   $user_data = array(
+								'last_updated'=>date("Y-m-d H:i:s"),
+								'status' => 'ACTIVE'
+								);
+	$this->db->where('email', $email);
+	$this->db->update('user',$user_data);
+	if($this->db->affected_rows() > 0){
+	return true;
+	}else{
+	return false;
+	}
 }
 
 
