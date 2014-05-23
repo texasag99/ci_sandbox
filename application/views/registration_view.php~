@@ -27,7 +27,7 @@ echo form_input('email',$this->input->post('email'));
 echo "</td></tr>";
 
 echo "<tr><td style='text-align:right;'>Password:</td><td> ";
-echo form_password('password',$this->input->post('password'));
+echo form_password('password');
 echo "</td></tr>";
 
 echo "<tr><td style='text-align:right;'>Confirm Password:</td><td> ";

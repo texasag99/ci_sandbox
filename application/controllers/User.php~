@@ -186,8 +186,8 @@ public function view_profile(){
 					$id = $user_data['id'];
 					$user_profile = $this->User_model->get_user_profile($id);					
 					$this->User_model->get_user_data($user_data);
-					$view_data['title']="User Profile";
-					$view_data['page_header']= "User Profile for: <strong>".$user_data['first']." ".$user_data['last']."</strong>";
+					$data['title']="User Profile";
+					$data['page_header']= "User Profile for: <strong>".$user_data['first']." ".$user_data['last']."</strong>";
 					$data= array_merge($view_data, $user_data, $user_profile);
 					$this->load->view('profile_view',$data);	
 			}else{

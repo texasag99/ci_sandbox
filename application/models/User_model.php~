@@ -136,8 +136,8 @@ public function get_user_data(){
        $user_profile['state']='empty';
        $user_profile['company_name'] = 'empty';
        $user_profile['country'] =  'empty';
-       $user_profile['profile_created'] =  'User profile has not been created';
-       $user_profile['profile_updated'] = 'User profile has not been updated';
+       $user_profile['profile_created'] =  'has not been created';
+       $user_profile['profile_updated'] = 'has not been updated';
        $user_profile['email2'] =  'empty';
        $user_profile['fax'] =  'empty';
        $user_profile['mobile'] =  'empty';
