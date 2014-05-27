@@ -1,32 +1,7 @@
--- phpMyAdmin SQL Dump
--- version 4.0.10deb1
--- http://www.phpmyadmin.net
---
--- Host: localhost
--- Generation Time: May 23, 2014 at 11:44 AM
--- Server version: 5.5.37-0ubuntu0.14.04.1
--- PHP Version: 5.5.9-1ubuntu4
 
-SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
-SET time_zone = "+00:00";
+DROP TABLE 'sessions'
 
-
-/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
-/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
-/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
-/*!40101 SET NAMES utf8 */;
-
---
--- Database: `ci_sandbox`
---
-
--- --------------------------------------------------------
-
---
--- Table structure for table `sessions`
---
-
-CREATE TABLE IF NOT EXISTS `sessions` (
+CREATE TABLE `sessions` (
   `session_id` varchar(40) COLLATE utf8_unicode_ci NOT NULL DEFAULT '0',
   `ip_address` varchar(45) COLLATE utf8_unicode_ci NOT NULL DEFAULT '0',
   `user_agent` varchar(120) COLLATE utf8_unicode_ci NOT NULL,
@@ -53,7 +28,9 @@ INSERT INTO `sessions` (`session_id`, `ip_address`, `user_agent`, `last_activity
 -- Table structure for table `temp_user`
 --
 
-CREATE TABLE IF NOT EXISTS `temp_user` (
+DROP TABLE 'temp_user';
+
+CREATE TABLE `temp_user` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `email` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
   `temp_key` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
@@ -65,8 +42,9 @@ CREATE TABLE IF NOT EXISTS `temp_user` (
 --
 -- Table structure for table `user`
 --
+DROP TABLE 'user';
 
-CREATE TABLE IF NOT EXISTS `user` (
+CREATE TABLE `user` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `email` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
   `password` char(64) COLLATE utf8_unicode_ci NOT NULL,
@@ -94,7 +72,9 @@ INSERT INTO `user` (`id`, `email`, `password`, `first`, `last`, `created`, `last
 -- Table structure for table `user_profile`
 --
 
-CREATE TABLE IF NOT EXISTS `user_profile` (
+DROP TABLE 'user_profile';
+
+CREATE TABLE `user_profile` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `user_id` int(11) NOT NULL,
   `address1` varchar(140) COLLATE utf8_unicode_ci NOT NULL,
@@ -115,6 +95,3 @@ CREATE TABLE IF NOT EXISTS `user_profile` (
   UNIQUE KEY `user_id` (`user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;
 
-/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
-/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
-/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
