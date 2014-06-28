@@ -3,7 +3,9 @@
 <div id="container">
 	<h1><?php echo $page_header; ?></h1>
 
-	<div id="body">
+<div id="body">
+<a href="<?php echo base_url().'User/edit_profile'  ?>">Edit Profile</a> | 
+<a href="<?php echo base_url().'User/logout'  ?>">Logout</a>
 
 <table class="field_table">
 <tbody>
@@ -26,7 +28,6 @@
 </table>
 <p></p>
 
-<a href="<?php echo base_url().'User/logout'  ?>">Logout</a>
 </div></div>
 
 </body>

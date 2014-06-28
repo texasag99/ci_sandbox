@@ -194,6 +194,22 @@ public function view_profile(){
 		      redirect ('User/restricted');	
 			}
 	} 
+	
+public function edit_profile(){
+				if ($this->session->userdata('is_logged_in')){
+					$this->load->model('User_model');
+					$user_data = $this->User_model->get_user_data();
+					$id = $user_data['id'];
+					$user_profile = $this->User_model->get_user_profile($id);					
+					$this->User_model->get_user_data($user_data);
+					$view_data['title']="Edit My Profile";
+					$view_data['page_header']= "User Profile for: <strong>".$user_data['first']." ".$user_data['last']."</strong>";
+					$data= array_merge($view_data, $user_data, $user_profile);
+					$this->load->view('edit_profile_view',$data);	
+			}else{
+		      redirect ('User/restricted');	
+			}
+	} 
  
  public function error_message($error){
          $data['title']="There is a problem!";
