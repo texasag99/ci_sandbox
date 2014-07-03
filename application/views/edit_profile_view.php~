@@ -50,7 +50,7 @@ echo form_input('zip',$zip);
 echo "</td></tr>";
 
 echo "<tr><td style='text-align:right;'>Country:</td><td> ";
-echo form_dropdown('country',$countries,$country);
+echo form_input('country',$country);
 echo "</td></tr>";
 
 echo "<tr><td style='text-align:right;'>Direct Tel:</td><td> ";

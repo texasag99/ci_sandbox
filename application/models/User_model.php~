@@ -1,11 +1,9 @@
 <?php
 /*
- * Filename : getsetDB.php
+ * Filename : User_model.php
  * Author : BEJAN NOURI
- * Date : 1-22-2013
- * Summary: THIS FILE CREATED AS PART OF THE TUTORIAL DEMONSTRATION FOR 
- * 			LEARNING CODEIGNITER. USED TO GET AND SET DB VALUES. 
- * 
+ * Date : 7-2-2014
+ * Summary: Access data related to the User controller and the Profile controller
  * */
 
 class User_model extends CI_Model {
@@ -85,11 +83,15 @@ public function activate_new_user($key){
    $user_data = array(
 								'last_updated'=>date("Y-m-d H:i:s"),
 								'status' => 'ACTIVE'
-								);
+								);				
 	$this->db->where('email', $email);
 	$this->db->update('user',$user_data);
 	if($this->db->affected_rows() > 0){
 	$this->db->delete('temp_user', array('temp_key' => $key));
+	$user_data = $this->get_user_data();
+	$id = $user_data['id'];
+	$user_profile = array('user_id'=>$id);
+	$this->db->insert('user_profile',$user_profile);
 	return true;	
 	}else{
 	return false;
@@ -121,7 +123,6 @@ public function get_user_data(){
        $user_profile['state'] = $row->state;
        $user_profile['company_name'] = $row->company_name;
        $user_profile['country'] = $row->country;
-       $user_profile['profile_created'] = $row->created;
        $user_profile['profile_updated'] = $row->last_updated;
        $user_profile['email2'] = $row->email2;
        $user_profile['fax'] = $row->fax;
@@ -130,23 +131,56 @@ public function get_user_data(){
 		 $user_profile['website'] = $row->website; 	
 	    $user_profile['zip'] = $row->zip;
  	}}else{
-  		 $user_profile['address1'] =  'empty';
-       $user_profile['address2'] =  'empty';
-       $user_profile['city'] =  'empty';
-       $user_profile['state']='empty';
-       $user_profile['company_name'] = 'empty';
-       $user_profile['country'] =  'empty';
-       $user_profile['profile_created'] =  'User profile has not been created';
-       $user_profile['profile_updated'] = 'User profile has not been updated';
-       $user_profile['email2'] =  'empty';
-       $user_profile['fax'] =  'empty';
-       $user_profile['mobile'] =  'empty';
-		 $user_profile['tel'] =  'empty';
-		 $user_profile['website'] = 'empty';	
-	    $user_profile['zip'] = 'empty'; 
+  		 return false;
  }
 return $user_profile;
 }
+
+
+public function update_user_data(){
+			$user_update = array(
+								'first'=>$this->input->post('first'),
+								'last'=>$this->input->post('last'),
+								'last_updated'=>date("Y-m-d H:i:s")
+			);
+			$user_data = $this->get_user_data();
+			$id = $user_data['id'];
+			$this->db->where('id', $id);
+         $this->db->update('user', $user_update);
+         if($this->db->affected_rows() > 0){
+	         return true;
+	         }else{
+				return false;         
+	         }
+	}
+	
+	public function update_user_profile(){
+			$user_profile = array(
+								'address1'=>$this->input->post('address1'),
+								'address2'=>$this->input->post('address2'),
+								'city'=>$this->input->post('city'),
+								'state'=>$this->input->post('state'),
+								'zip'=>$this->input->post('zip'),
+								'country'=>$this->input->post('country'),
+								'email2'=>$this->input->post('email2'),
+								'tel'=>$this->input->post('tel'),
+								'mobile'=>$this->input->post('mobile'),
+								'fax'=>$this->input->post('fax'),
+								'company_name'=>$this->input->post('company_name'),
+								'website'=>$this->input->post('website'),						
+								'last_update'=>date("Y-m-d H:i:s")
+			);
+			$user_data = $this->get_user_data();
+			$id = $user_data['id'];
+			$this->db->where('user_id', $id);
+         $this->db->update('user_profile', $user_profile);
+         if($this->db->affected_rows() > 0){
+	         return true;
+	         }else{
+				return false;         
+	         }
+	}
+
 
 
 }

@@ -1,65 +1,10 @@
 <?php
-/**
- * CodeIgniter
- *
- * An open source application development framework for PHP 5.2.4 or newer
- *
- * NOTICE OF LICENSE
- *
- * Licensed under the Academic Free License version 3.0
- *
- * This source file is subject to the Academic Free License (AFL 3.0) that is
- * bundled with this package in the files license_afl.txt / license_afl.rst.
- * It is also available through the world wide web at this URL:
- * http://opensource.org/licenses/AFL-3.0
- * If you did not receive a copy of the license and are unable to obtain it
- * through the world wide web, please send an email to
- * licensing@ellislab.com so we can send you a copy immediately.
- *
- * @package		CodeIgniter
- * @author		EllisLab Dev Team
- * @copyright	Copyright (c) 2008 - 2014, EllisLab, Inc. (http://ellislab.com/)
- * @license		http://opensource.org/licenses/AFL-3.0 Academic Free License (AFL 3.0)
- * @link		http://codeigniter.com
- * @since		Version 1.0
- * @filesource
- */
 defined('BASEPATH') OR exit('No direct script access allowed');
 
 
 class User extends CI_Controller {
 
-	/**
-	 * Index Page for this controller.
-	 *
-	 * Maps to the following URL
-	 * 		http://example.com/index.php/welcome
-	 *	- or -  
-	 * 		http://example.com/index.php/welcome/index
-	 *	- or -
-	 * Since this controller is set as the default controller in 
-	 * config/routes.php, it's displayed at http://example.com/
-	 *
-	 * So any other public methods not prefixed with an underscore will
-	 * map to /index.php/welcome/<method_name>
-	 * @see http://codeigniter.com/user_guide/general/urls.html
-	 */
 
-	/**
-	 * Index Page for this controller.
-	 *
-	 * Maps to the following URL
-	 * 		http://example.com/index.php/welcome
-	 *	- or -  
-	 * 		http://example.com/index.php/welcome/index
-	 *	- or -
-	 * Since this controller is set as the default controller in 
-	 * config/routes.php, it's displayed at http://example.com/
-	 *
-	 * So any other public methods not prefixed with an underscore will
-	 * map to /index.php/welcome/<method_name>
-	 * @see http://codeigniter.com/user_guide/general/urls.html
-	 */
 public function index(){
 		$this->login();
 	}
@@ -113,7 +58,10 @@ public function registration_validation(){
 						$key = md5(uniqid());
 						   //add the user info to the db, build the email and send and email to the new user
 						$this->load->library('email');
-						$this->email->from('bejan.nouri@gmail.com',"Bejan Nouri");
+						$this->load->model('Config_model');
+						$from_email = $this->Config_model->get_from_email();
+						$from_name = $this->Config_model->get_from_name();
+						$this->email->from($from_email, $from_name);
 						$this->email->to($this->input->post('email'))	;
 						$this->email->subject('Confirm your account!');
 						$message = "<p>Thank you for signing up</p>";
@@ -179,11 +127,24 @@ public function validate_credentials(){
 	     }
  }
  
- 
+ public function change_password(){
+				if ($this->session->userdata('is_logged_in')){
+					$this->load->model('User_model');
+					$user_data = $this->User_model->get_user_data();
+					$view_data['title']="Change My Password";
+					$view_data['page_header']= "Change password for: <strong>".$user_data['first']." ".$user_data['last']."</strong>";
+					$data= array_merge($view_data, $user_data);
+					$this->load->view('password_change_view',$data);	
+			}else{
+		      redirect ('User/restricted');	
+			}
+	} 
+	
  public function error_message($error){
-         $data['title']="There is a problem!";
+         $data['title']="There is a problem with the User controller!";
 	      $data['page_header']="<span id='error'>There is a problem!</span>";
 	      $data['error_message']= $error;
+	      $this->session->sess_destroy();
 			$this->load->view('There_is_a_problem_view',$data); 
  }
 

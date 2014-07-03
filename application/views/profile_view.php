@@ -1,11 +1,17 @@
-<?php include("header.php"); ?>
+<?php include("header.php"); 
+if(ISSET($_SERVER['HTTP_REFERER'])){
+	$go_back_url = $_SERVER['HTTP_REFERER'];
+}else{ 
+    $go_back_url = base_url().'/User/login';
+}
+?>
 
 <div id="container">
 	<h1><?php echo $page_header; ?></h1>
 
 <div id="body">
-<a href="<?php echo base_url().'Profile/edit_profile'  ?>">Edit Profile</a> | 
-<a href="<?php echo base_url().'User/logout'  ?>">Logout</a>
+<a href="<?php echo $go_back_url; ?>"><< Go Back!</a>  |  
+<a href="<?php echo base_url().'Profile/edit_profile'  ?>">Edit Profile</a> 
 
 <table class="field_table">
 <tbody>
@@ -22,7 +28,7 @@
 <tr><td class="align_right field_header">Fax:</td><td class="field_value">&nbsp;<?php echo $fax; ?><td></tr>
 <tr><td class="align_right field_header">Website (URL):</td><td class="field_value">&nbsp;<a href="<?php echo $website; ?>"><?php echo $website; ?></a><td></tr>
 <tr><td class="align_right field_header">Alternate Email:</td><td class="field_value">&nbsp;<?php echo $email2; ?><td></tr>
-<tr><td class="align_right field_header">Created On:</td><td class="field_value">&nbsp;<?php echo $profile_created; ?><td></tr>
+<tr><td class="align_right field_header">Created On:</td><td class="field_value">&nbsp;<?php echo $created; ?><td></tr>
 <tr><td class="align_right field_header">Last Updated:</td><td class="field_value">&nbsp;<?php echo $profile_updated; ?><td></tr>
 </tbody>
 </table>
