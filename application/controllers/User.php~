@@ -113,10 +113,7 @@ public function registration_validation(){
 						$key = md5(uniqid());
 						   //add the user info to the db, build the email and send and email to the new user
 						$this->load->library('email');
-						$this->load->model('Config_model');
-						$from_email = $this->Config_model->get_from_email();
-						$from_name = $this->Config_model->get_from_name();
-						$this->email->from($from_email, $from_name);
+						$this->email->from('bejan.nouri@gmail.com',"Bejan Nouri");
 						$this->email->to($this->input->post('email'))	;
 						$this->email->subject('Confirm your account!');
 						$message = "<p>Thank you for signing up</p>";

@@ -1,9 +1,11 @@
 <?php
 /*
- * Filename : User_model.php
+ * Filename : getsetDB.php
  * Author : BEJAN NOURI
- * Date : 7-2-2014
- * Summary: Access data related to the User controller and the Profile controller
+ * Date : 1-22-2013
+ * Summary: THIS FILE CREATED AS PART OF THE TUTORIAL DEMONSTRATION FOR 
+ * 			LEARNING CODEIGNITER. USED TO GET AND SET DB VALUES. 
+ * 
  * */
 
 class User_model extends CI_Model {
