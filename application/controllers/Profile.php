@@ -48,7 +48,7 @@ public function profile_validation(){
 			$this->load->library('form_validation');
 			$this->form_validation->set_rules('first', 'First Name', 'required|trim');
 			$this->form_validation->set_rules('last', 'Last Name', 'required|trim');	
-			$this->form_validation->set_message('is_unique',"The user email already exists.");
+			$this->form_validation->set_rules('zip', 'Zip Code', 'trim|min_length[5]|max_length[10]|xss_clean');
 			if ($this->form_validation->run()){
 					    $this->load->model('User_model');
 					    if (($this->User_model->update_user_data())&&($this->User_model->update_user_profile())){

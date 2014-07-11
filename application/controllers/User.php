@@ -138,7 +138,27 @@ public function validate_credentials(){
 			}else{
 		      redirect ('User/restricted');	
 			}
-	} 
+	}
+
+public function password_validation(){
+	$this->load->library('form_validation');
+	$this->form_validation->set_rules('password', 'Password', 'required|trim|min_length[8]');
+	$this->form_validation->set_rules('confirm_password', 'Confirm Password', 'required|trim|matches[password]');
+		if($this->form_validation->run()){
+		   $this->load->model('User_model');
+		   $data = array(
+			'password'=>$this->input->post('password'),
+			'email'=>$this->session->userdata('email')
+		   );
+			if($this->User_model->change_user_password($data)){
+				echo "do nothing";
+			}else{
+				$this->error_message('There was a problem updating your password. Return to the <a href="/User/login">Log in </a> page.');
+			}
+		}else{
+		   $this->change_password();
+		}
+} 
 	
  public function error_message($error){
          $data['title']="There is a problem with the User controller!";
