@@ -73,5 +73,5 @@ public function profile_validation(){
 
 
 }
-/* End of file proflle.php */
+/* End of file user.php */
 /* Location: ./application/controllers/Profile.php */

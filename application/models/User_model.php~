@@ -212,7 +212,7 @@ public function update_user_data(){
 	         }
 	}
 	
-  public function register_new_password($data){
+	public function register_new_password($data){
          $this->db->insert('temp_user', $data);
          if($this->db->affected_rows() > 0){
 	         return true;
@@ -238,6 +238,4 @@ public function update_user_data(){
 				return false;		 
 		 }	
 	}
-	
-
 }

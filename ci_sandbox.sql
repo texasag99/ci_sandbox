@@ -3,9 +3,9 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: localhost
--- Generation Time: Jul 03, 2014 at 04:48 PM
+-- Generation Time: Jul 15, 2014 at 10:56 PM
 -- Server version: 5.5.37-0ubuntu0.14.04.1
--- PHP Version: 5.5.9-1ubuntu4.2
+-- PHP Version: 5.5.9-1ubuntu4.3
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 SET time_zone = "+00:00";
@@ -75,8 +75,18 @@ CREATE TABLE IF NOT EXISTS `temp_user` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `email` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
   `temp_key` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+  `password` char(64) COLLATE utf8_unicode_ci NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=5 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=19 ;
+
+--
+-- Dumping data for table `temp_user`
+--
+
+INSERT INTO `temp_user` (`id`, `email`, `temp_key`, `password`) VALUES
+(18, 'bejan.nouri@gmail.com', '00722e90a4bd853cd99bf1af9dc679cf', ''),
+(17, 'bejan.nouri@gmail.com', 'a52ea99d16e9612c0efb87b2c2f3e971', ''),
+(16, 'bejan.nouri@gmail.com', 'c58c0b04b682e2892ddbb2a87beaad9f', '');
 
 -- --------------------------------------------------------
 
@@ -96,14 +106,16 @@ CREATE TABLE IF NOT EXISTS `user` (
   `locked` tinyint(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
   UNIQUE KEY `email` (`email`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=2 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=4 ;
 
 --
 -- Dumping data for table `user`
 --
 
 INSERT INTO `user` (`id`, `email`, `password`, `first`, `last`, `created`, `last_updated`, `status`, `locked`) VALUES
-(1, 'bejan.nouri@gmail.com', '1267a87a8017ae58f47f55f3c0089fbf', 'Bejan', 'Nouri', '2014-07-03 00:00:00', '2014-07-03 16:46:26', 'ACTIVE', 0);
+(1, 'bejan.nouri@gmail.com', '1267a87a8017ae58f47f55f3c0089fbf', 'Bejan', 'Nouri', '2014-07-03 00:00:00', '2014-07-11 13:31:58', 'ACTIVE', 0),
+(2, 'bejan.nouri@live.com', '1267a87a8017ae58f47f55f3c0089fbf', 'Bejan', 'Nouri', '2014-07-11 13:32:27', '2014-07-11 14:59:59', 'ACTIVE', 0),
+(3, 'bejan.nouri@csfi.com', '1267a87a8017ae58f47f55f3c0089fbf', 'Bejan', 'Nouri', '2014-07-11 15:20:17', '2014-07-11 15:41:34', 'ACTIVE', 0);
 
 -- --------------------------------------------------------
 
@@ -129,14 +141,16 @@ CREATE TABLE IF NOT EXISTS `user_profile` (
   `last_updated` datetime NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `user_id` (`user_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=3 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=4 ;
 
 --
 -- Dumping data for table `user_profile`
 --
 
 INSERT INTO `user_profile` (`id`, `user_id`, `address1`, `address2`, `city`, `state`, `zip`, `country`, `email2`, `tel`, `mobile`, `fax`, `company_name`, `website`, `last_updated`) VALUES
-(1, 1, '4574 Robin Hood Trail', '', 'Sarasota', 'FL', 34232, 'US', 'bejan.nouri@live.com', '941-444-6514', '941-444-6514', '', '', 'threshinglabs.com', '2014-07-03 16:46:26');
+(1, 1, '4574 Robin Hood Trail', '', 'Sarasota', 'FL', 34232, 'US', 'bejan.nouri@live.com', '941-444-6514', '941-444-6514', '', '', 'http://www.threshinglabs.com', '2014-07-11 13:31:58'),
+(2, 2, '1629 Barber Road', '', 'Sarasota', 'FL', 34240, 'US', 'bejan.nouri@csfi.com', '941-379-0881', '941-444-6514', '', '', '', '2014-07-11 14:59:59'),
+(3, 3, '1629 Barber Road', '', 'Sarasota', 'FL', 34232, 'US', 'bejan.nouri@live.com', '941-379-0881', '941-444-6514', '', '', 'http://www.csfi.com', '2014-07-11 15:41:34');
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
