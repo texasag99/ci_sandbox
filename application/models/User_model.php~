@@ -100,12 +100,12 @@ public function get_retry_limit() {
 	$query = $this->db->get('config');
  	foreach($query->result() as $row){
  		$retry_limit= $row->retry_limit;
- 	    }
- 	return $retry_limit;
+ 	 }
+ return $retry_limit;
 	}	
+}
 
-
-public function verify_email($email){
+public function verify_email($email)	{
 		$this->db->where('email', $email);
 		$query = $this->db->get('user');		
 		if($query->num_rows() == 1){

@@ -53,7 +53,7 @@ define('ENVIRONMENT', isset($_SERVER['CI_ENV']) ? $_SERVER['CI_ENV'] : 'developm
 *Used to define globally used values like the application name or title, or other important values
 */
 
-$global_definitions = 'application/config/defines.php';
+$global_definitions = 'includes/defines.php';
 if (file_exists($global_definitions))
 {
     require_once($global_definitions);

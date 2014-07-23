@@ -16,7 +16,7 @@ if(ISSET($_SERVER['HTTP_REFERER'])){
 
 <table><tbody>
 <?php 
-echo form_open('User/fmp_email_validation');
+echo form_open('User/fmp_validation');
 
 echo '<tr><td></td><td><div style="color:red;">'.validation_errors().'</div></td></tr>';
 

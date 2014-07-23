@@ -3,8 +3,8 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: localhost
--- Generation Time: Jul 15, 2014 at 10:56 PM
--- Server version: 5.5.37-0ubuntu0.14.04.1
+-- Generation Time: Jul 23, 2014 at 12:06 AM
+-- Server version: 5.5.38-0ubuntu0.14.04.1
 -- PHP Version: 5.5.9-1ubuntu4.3
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
@@ -28,15 +28,32 @@ SET time_zone = "+00:00";
 
 CREATE TABLE IF NOT EXISTS `config` (
   `from_email` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
-  `from_name` varchar(255) COLLATE utf8_unicode_ci NOT NULL
+  `from_name` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+  `retry_limit` int(2) NOT NULL DEFAULT '3'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 --
 -- Dumping data for table `config`
 --
 
-INSERT INTO `config` (`from_email`, `from_name`) VALUES
-('bejan.nouri@gmail.com', 'Bejan Nouri');
+INSERT INTO `config` (`from_email`, `from_name`, `retry_limit`) VALUES
+('bejan.nouri@gmail.com', 'Bejan Nouri', 5);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `permissions`
+--
+
+CREATE TABLE IF NOT EXISTS `permissions` (
+  `id` int(4) DEFAULT NULL,
+  `name` varchar(100) COLLATE utf8_unicode_ci NOT NULL,
+  `description` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+  `category` varchar(100) COLLATE utf8_unicode_ci NOT NULL,
+  `category_id` int(3) NOT NULL,
+  `created` datetime NOT NULL,
+  `last_updated` datetime NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 -- --------------------------------------------------------
 
@@ -60,9 +77,13 @@ CREATE TABLE IF NOT EXISTS `sessions` (
 --
 
 INSERT INTO `sessions` (`session_id`, `ip_address`, `user_agent`, `last_activity`, `user_data`, `created`) VALUES
+('4060656150952daec68c54ec93d9bec6', '127.0.0.1', 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/36.0.1985.125 Safari/537.36', 1406039405, 'a:2:{s:5:"email";s:21:"bejan.nouri@gmail.com";s:12:"is_logged_in";i:1;}', NULL),
 ('671604f5ca34c4ea0512c4951c04f046', '192.168.1.14', 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:26.0) Gecko/20100101 Firefox/26.0', 1399490621, '', '2014-05-07 03:23:41'),
+('6be275b2472135aaa2fe32e7870b8d33', '127.0.0.1', 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:30.0) Gecko/20100101 Firefox/30.0', 1406042641, '', NULL),
 ('8c7401a034c5b6d72b0bb0cf733d93a9', '127.0.0.1', 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:29.0) Gecko/20100101 Firefox/29.0', 1399469133, '', '2014-05-07 09:02:51'),
+('ae739edb72054670a13e3d98de6e1e3a', '127.0.0.1', 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:30.0) Gecko/20100101 Firefox/30.0', 1406088274, 'a:3:{s:5:"email";s:21:"bejan.nouri@gmail.com";s:12:"is_logged_in";i:1;s:4:"name";s:11:"Bejan Nouri";}', NULL),
 ('d63c6b9f176f5c9af06b57ce7dee426d', '192.168.1.14', 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/34.0.1847.132 Safari/537.36', 1399490120, 'a:4:{s:9:"user_data";s:0:"";s:7:"created";s:21:"2014/05/07 03:15:20pm";s:5:"email";s:21:"bejan.nouri@gmail.com";s:12:"is_logged_in";i:1;}', '2014-05-07 03:15:20'),
+('f3b87d43ef84de03269f476d8ecd197d', '127.0.0.1', 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/36.0.1985.125 Safari/537.36', 1406043172, 'a:2:{s:5:"email";s:21:"bejan.nouri@gmail.com";s:12:"is_logged_in";i:1;}', NULL),
 ('fe43e7bcb43803979040921e115279bb', '192.168.1.14', 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/34.0.1847.132 Safari/537.36', 1399471414, 'a:4:{s:9:"user_data";s:0:"";s:7:"created";s:21:"2014/05/07 09:32:20am";s:5:"email";s:21:"bejan.nouri@gmail.com";s:12:"is_logged_in";i:1;}', '2014-05-07 09:32:20');
 
 -- --------------------------------------------------------
@@ -77,16 +98,7 @@ CREATE TABLE IF NOT EXISTS `temp_user` (
   `temp_key` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
   `password` char(64) COLLATE utf8_unicode_ci NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=19 ;
-
---
--- Dumping data for table `temp_user`
---
-
-INSERT INTO `temp_user` (`id`, `email`, `temp_key`, `password`) VALUES
-(18, 'bejan.nouri@gmail.com', '00722e90a4bd853cd99bf1af9dc679cf', ''),
-(17, 'bejan.nouri@gmail.com', 'a52ea99d16e9612c0efb87b2c2f3e971', ''),
-(16, 'bejan.nouri@gmail.com', 'c58c0b04b682e2892ddbb2a87beaad9f', '');
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=26 ;
 
 -- --------------------------------------------------------
 
@@ -104,6 +116,7 @@ CREATE TABLE IF NOT EXISTS `user` (
   `last_updated` datetime DEFAULT NULL,
   `status` varchar(100) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'INACTIVE',
   `locked` tinyint(1) NOT NULL DEFAULT '0',
+  `retry_counter` int(2) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
   UNIQUE KEY `email` (`email`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=4 ;
@@ -112,10 +125,10 @@ CREATE TABLE IF NOT EXISTS `user` (
 -- Dumping data for table `user`
 --
 
-INSERT INTO `user` (`id`, `email`, `password`, `first`, `last`, `created`, `last_updated`, `status`, `locked`) VALUES
-(1, 'bejan.nouri@gmail.com', '1267a87a8017ae58f47f55f3c0089fbf', 'Bejan', 'Nouri', '2014-07-03 00:00:00', '2014-07-11 13:31:58', 'ACTIVE', 0),
-(2, 'bejan.nouri@live.com', '1267a87a8017ae58f47f55f3c0089fbf', 'Bejan', 'Nouri', '2014-07-11 13:32:27', '2014-07-11 14:59:59', 'ACTIVE', 0),
-(3, 'bejan.nouri@csfi.com', '1267a87a8017ae58f47f55f3c0089fbf', 'Bejan', 'Nouri', '2014-07-11 15:20:17', '2014-07-11 15:41:34', 'ACTIVE', 0);
+INSERT INTO `user` (`id`, `email`, `password`, `first`, `last`, `created`, `last_updated`, `status`, `locked`, `retry_counter`) VALUES
+(1, 'bejan.nouri@gmail.com', '1267a87a8017ae58f47f55f3c0089fbf', 'Bejan', 'Nouri', '2014-07-03 00:00:00', '2014-07-21 11:46:59', 'ACTIVE', 0, 0),
+(2, 'bejan.nouri@live.com', '1267a87a8017ae58f47f55f3c0089fbf', 'Bejan', 'Nouri', '2014-07-11 13:32:27', '2014-07-11 14:59:59', 'ACTIVE', 0, 0),
+(3, 'bejan.nouri@csfi.com', '1267a87a8017ae58f47f55f3c0089fbf', 'Bejan', 'Nouri', '2014-07-11 15:20:17', '2014-07-11 15:41:34', 'ACTIVE', 0, 0);
 
 -- --------------------------------------------------------
 

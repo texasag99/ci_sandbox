@@ -18,7 +18,7 @@
 
 </ul>
 <?php if ($this->session->userdata('is_logged_in')){  
-		echo "<p class='login_name'><a  href='".base_url()."Profile'>".$this->session->userdata('name')."</a> is logged in.</p>";
+		echo "<p class='login_name'><a  href='".base_url()."User/profile'>".$this->session->userdata('name')."</a> is logged in.</p>";
 		}else{
 		 echo " ";
 		 }

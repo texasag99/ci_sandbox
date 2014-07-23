@@ -35,7 +35,7 @@ $query = $this->db->get('config');
  return $from_name;
 	}	
 
-public function set_from_name($from_name)	{
+public function set_from_namel($from_name)	{
 		$data = array(
 			'from_name'=>$from_name
 		);
