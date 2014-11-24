@@ -44,7 +44,24 @@ public function set_from_name($from_name)	{
 		}else{
 		return false;
 		}
-}
-
-
+   }
+	
+public function get_default_pagination(){
+		$query = $this->db->get('config');
+	     foreach($query->result() as $row){
+ 		 $default_pagination= $row->default_pagination;
+		 }
+		 return $default_pagination;
+		 }
+	
+public function set_default_pagination($default_pagination)	{
+		$data = array(
+			'default_pagination'=>$default_pagination
+		);
+		if($this->db->update('config',$data)){
+		return true;
+		}else{
+		return false;
+		}
+   }
 }

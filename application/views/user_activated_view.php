@@ -1,6 +1,6 @@
 <?php include("header.php"); ?>
 
-<div id="container">
+
 <h1><?php echo $page_header; ?></h1>
 
 <div id="body">

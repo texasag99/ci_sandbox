@@ -6,11 +6,12 @@ if(ISSET($_SERVER['HTTP_REFERER'])){
 }
 ?>
 
-<div id="container">
+
 <h1><?php echo $page_header; ?></h1>
 
 <div id="body">
-<a href="<?php echo $go_back_url; ?>"><< Go Back!</a>
+<div id="form_container_500">
+<a class="btn btn-default" href="<?php echo $go_back_url; ?>">Go Back!</a>
  <h3>Please enter a new password!</h3>
  <p style="max-width:800px; border:1px solid dark-gray; background-color:silver; padding:10px;"></p>
 
@@ -18,28 +19,26 @@ if(ISSET($_SERVER['HTTP_REFERER'])){
 <?php 
 echo form_open('User/password_validation');
 
-echo '<tr><td></td><td><div style="color:red;">'.validation_errors().'</div></td></tr>';
+echo '<div class="warning" style="color:red;">'.validation_errors().'</div>';
 
-echo "<tr><td style='text-align:right;'>Current Password:</td><td> ";
+echo "<label for='current_password'>Current Password:</label> ";
 echo form_password('current_password',$this->input->post('current_password'));
-echo "</td></tr>";
 
-echo "<tr><td style='text-align:right;'>Password:</td><td> ";
+
+echo "<label for='password'>Password:</label> ";
 echo form_password('password',$this->input->post('password'));
-echo "</td></tr>";
 
-echo "<tr><td style='text-align:right;'>Confirm Password:</td><td> ";
+
+echo "<label for='confirm_password'>Confirm Password:</label> ";
 echo form_password('confirm_password');
-echo "</td></tr>";
 
-echo "<tr><td></td><td>";
-echo form_submit('login_submit', 'Submit');
-echo "</td></tr>";
+echo '<br><button type="submit" class="btn btn-primary">Update</button>';
 		 
 echo form_close();
 
 ?>
-</tbody></table>
+</div><!--container-->
+</div><!--body-->
 </div>
 </div>
 

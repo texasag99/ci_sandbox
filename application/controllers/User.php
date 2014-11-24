@@ -207,6 +207,22 @@ public function verify_email(){
 
 }
 
+public function ajax_verify($type, $value){
+	$this->load->model('User_model');
+	$type = strtolower(trim($type));
+	$value = (trim($value));
+	$output = ['exists' => false];
+	if(in_array($type, ['email'])){
+		switch($type){
+			case 'email':
+			    $value = str_replace("-","@", $value); //because the '@' cannot be passed in the URI, I am using the '-' symbol and replacing it here.
+				$check = $this->User_model->verify_email($value);
+			    $output['exists'] = $check;
+				echo json_encode($output);
+			break;			
+		}	
+	}
+}
 public function fmp_confirm($key){
   $this->load->model('User_model');
   $return_values = true;
@@ -311,6 +327,7 @@ public function password_validation(){
 		   $this->change_password();
 		}
 } 
+
 public function verify_password(){
 	$this->load->model('User_model');
 	$password = md5($this->input->post('current_password'));
@@ -343,18 +360,18 @@ public function confirm_password($key){
 	} 
 }
 	
- public function error_message($error){
+/* public function error_message($error){
          $data['title']="There is a problem with the User controller!";
 	      $data['page_header']="<span id='error'>There is a problem!</span>";
 	      $data['error_message']= $error;
 			$this->load->view('There_is_a_problem_view',$data); 
- }
+ }*/
  
  public function restricted(){
 			$this->session->sess_destroy();//if the user attempts to access a restricted area...destroy the session
 	      $data['title']="There is a problem!";
 	      $data['page_header']="There is a problem!";
-	      $data['error_message']="<span style='color:red; font-size:2em; font-weight:bold;'>Restricted Access!</span><br><br>You have attempted to access an area that is restricted.";
+	      $data['error_message']="<span style='color:maroon; font-size:2em; font-weight:bold;'>Restricted Access!</span><br><br>You have attempted to access an area that is restricted.";
 			$this->load->view('There_is_a_problem_view',$data);
 	}
 

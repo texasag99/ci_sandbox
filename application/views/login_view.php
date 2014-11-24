@@ -1,41 +1,32 @@
 <?php include("header.php"); ?>
 
-<div id="container">
-	<h1><?php echo $page_header; ?></h1>
 
-	<div id="body">
-	<a href='<?php echo base_url()."User/registration"; ?>'>Register</a> | 
-	<a href='<?php echo base_url()."User/forgot_my_password"; ?>'>Forgot My Password</a>
-	 <h3>Please enter your email and password!</h3>
-	 <p style="max-width:800px; border:1px solid dark-gray; background-color:silver; padding:10px;">
-     Please login here. </p>
-<table><tbody>
+<h1><?php echo $page_header; ?></h1>
+
+<div id="body">
+<div id="login_container">
+<a href='<?php echo base_url()."User/registration"; ?>' class="btn btn-default">Register</a> &nbsp;&nbsp;
+<a href='<?php echo base_url()."User/forgot_my_password"; ?>' class="btn btn-default">Forgot My Password</a>
+<h3>Please enter your email and password!</h3>
+<div class="form-group">
+<p style="max-width:100%; border:1px solid dark-gray; background-color:silver; padding:10px;">
+Please login here. </p>
+
 <?php 
 echo form_open('User/login_validation');
-
-echo '<tr><td></td><td><div style="color:red;">'.validation_errors().'</div></td></tr>';
-
-echo "<tr><td style='text-align:right;'>Email:</td><td> ";
+echo '<div class="warning" style="color:red;">'.validation_errors().'</div>';
+echo "<label for='email'>Email:</label>";
 echo form_input('email',$this->input->post('email'));
-echo "</td></tr>";
-
-echo "<tr><td style='text-align:right;'>Password:</td><td> ";
+echo "<label for='password'>Password:</label>";
 echo form_password('password');
-echo "</td></tr>";
-
-echo "<tr><td></td><td>";
-echo form_submit('login_submit', 'Login');
-echo "</td></tr>";
-		 
+echo '<br><button type="submit" class="btn btn-primary">Login</button>';
 echo form_close();
 
 ?>
-</tbody></table>
-
-
+</div><!--container-->
+</div><!--body-->
 </div>
 </div>
-
 </body>
 </html>
 

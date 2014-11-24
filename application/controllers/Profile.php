@@ -62,6 +62,16 @@ public function profile_validation(){
 						$this->edit_profile();
 			}
 }
+	
+public function profile_inlineEdit(){
+			 $this->load->model('User_model');
+			 if ($this->User_model->update_user_profile_city()){
+					     return $this->input->post('city');
+					     }else{
+					     $error = 'There was an error in loading the user data';
+					     return $error; 
+					     }
+}	
  
  public function error_message($error){
          $data['title']="There is a problem with the Profile controller!";

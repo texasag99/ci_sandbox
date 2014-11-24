@@ -77,6 +77,15 @@ class CI_Controller {
 	 * @static
 	 * @return	object
 	 */
+	
+	 public function error_message($error){
+		$data['title']="There is a problem with the controller!";
+		$data['page_header']="<span id='error'>There is a problem!</span>";
+		$data['error_message']= $error;
+		$this->load->view('There_is_a_problem_view',$data); 
+ 	}
+	
+	
 	public static function &get_instance()
 	{
 		return self::$instance;

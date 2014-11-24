@@ -8,7 +8,7 @@
 
 class User_model extends CI_Model {
 
-public function can_log_in()	{
+public function can_log_in(){
 		$email = $this->input->post('email');
 		$password = md5($this->input->post('password'));		
 		if($this->verify_password($password, $email)){
@@ -16,9 +16,9 @@ public function can_log_in()	{
 			}else{
 			return false;
 			}		
-}		
+}	//Verifies the user can login	
 
-public function is_active()	{
+public function is_active(){
 		$this->db->where('email', $this->input->post('email'));
 		$this->db->where('status','ACTIVE');
 		$query = $this->db->get('user');		
@@ -27,9 +27,9 @@ public function is_active()	{
 			}else{
 			return false;
 			}		
-	}	
+	}	//Verifies the user account is active
 	
-public function is_unlocked()	{
+public function is_unlocked(){
 		$this->db->where('email', $this->input->post('email'));
 		$this->db->where('locked',0);
 		$query = $this->db->get('user');		
@@ -38,8 +38,19 @@ public function is_unlocked()	{
 			}else{
 			return false;
 			}		
-	}	
-public function verify_password($password, $email)	{
+	}	//Verifies the user account is not locked
+
+public function verify_email($email){
+		$this->db->where('email', $email);
+		$query = $this->db->get('user');		
+		if($query->num_rows() == 1){
+			return true;
+			}else{
+			return false;
+			}		
+	} //Verifies the user account exists
+	
+public function verify_password($password, $email){
 		$this->db->where('email', $email);
 		$this->db->where('password', $password);
 		$query = $this->db->get('user');		
@@ -53,7 +64,7 @@ public function verify_password($password, $email)	{
 				return false;
 				}
 		   }		
-	}	
+	} //Verifies the password is correct
 	
 public function increase_retry_counter($email){ //increments the password retries
 	$this->db->where('email',$email);
@@ -87,14 +98,14 @@ public function increase_retry_counter($email){ //increments the password retrie
    	}else{
    	return false;
    	}
-    }
-}
+   }
+} //For failed password attempts, mark the retry counter
 
 public function reset_retry_counter($email){
 	$user_data= array( 'retry_counter'=>0);
    $this->db->where('email',$email);
    $this->db->update('user',$user_data); 
-}
+} //For successful password validation, take the retry counter back to 0
 
 public function get_retry_limit() {
 	$query = $this->db->get('config');
@@ -102,18 +113,8 @@ public function get_retry_limit() {
  		$retry_limit= $row->retry_limit;
  	    }
  	return $retry_limit;
-	}	
+	} //Pull the retry limit set in the config table	
 
-
-public function verify_email($email){
-		$this->db->where('email', $email);
-		$query = $this->db->get('user');		
-		if($query->num_rows() == 1){
-			return true;
-			}else{
-			return false;
-			}		
-	}	
 public function update_password($password, $email){
 $user_data = array (
 		'password' => $password,
@@ -126,7 +127,7 @@ if($this->db->affected_rows() >0){
 				}else{
 					return false;
 				}
-}
+} 
 
 public function register_new_user($data){
 			$user_data = array(
@@ -268,6 +269,22 @@ public function update_user_profile(){
 	         return true;
 	         }else{
 				return false;         
+	         }
+	}
+
+public function update_user_profile_city(){
+			$profile_data = array(
+								'city'=>$this->input->post('city'),
+								'last_updated'=>date("Y-m-d H:i:s")
+			);
+			$user_data = $this->get_user_data($this->session->userdata('email'));
+			$id = $user_data['id'];
+			$this->db->where('user_id', $id);
+         $this->db->update('user_profile', $profile_data);
+         if($this->db->affected_rows() > 0){
+	         return true;
+	         }else{
+			  return false;         
 	         }
 	}
 	

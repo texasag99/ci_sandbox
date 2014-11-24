@@ -6,32 +6,32 @@ if(ISSET($_SERVER['HTTP_REFERER'])){
 }
 ?>
 
-<div id="container">
+
 <h1><?php echo $page_header; ?></h1>
 
 <div id="body">
-<a href="<?php echo $go_back_url; ?>"><< Go Back!</a>
+<div id="form_container_500">
+<a class="btn btn-default" href="<?php echo $go_back_url; ?>">Go Back!</a>
  <h3>Forgot My Password</h3>
  <p style="max-width:800px; border:1px solid dark-gray; background-color:silver; padding:10px;">Please enter your email:</p>
 
-<table><tbody>
+<div class="form-group"
 <?php 
 echo form_open('User/fmp_email_validation');
 
-echo '<tr><td></td><td><div style="color:red;">'.validation_errors().'</div></td></tr>';
+echo '<div class="warning" style="color:red;">'.validation_errors().'</div>';
 
-echo "<tr><td style='text-align:right;'>Email address:</td><td> ";
+echo "<label for='email'>Email:</label> ";
 echo form_input('email',$this->input->post('email'));
-echo "</td></tr>";
 
-echo "<tr><td></td><td>";
-echo form_submit('login_submit', 'Submit');
-echo "</td></tr>";
-		 
+echo '<br><button type="submit" class="btn btn-primary">Submit</button>';
+	 
 echo form_close();
 
 ?>
-</tbody></table>
+
+</div><!--form-group-->
+</div><!--form container-->
 </div>
 </div>
 
