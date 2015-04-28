@@ -82,6 +82,9 @@ h1 {
 	display:block;
 	width: 75px;
 }
+.multi-select{
+min-width: 250px;	
+	}
 
 .login_name{
 	margin-left:90%;	
@@ -101,6 +104,17 @@ h1 {
 	font-weight: bold;
 	text-decoration:  underline;
 }
+
+.elapsed{
+	width:100%;
+	background-color:#f5f3ee;
+	text-align:center;
+	text-decoration:none;
+	color: #bab3b2;
+	padding-left: 15px;
+	font-family: Consolas, Monaco, Courier New, Courier, monospace;
+	font-size: 10px; 	
+	}
 
 code {
 	font-family: Consolas, Monaco, Courier New, Courier, monospace;
@@ -176,7 +190,35 @@ code {
 	overflow: hidden;
 }
 
+.setting{
+max-width: 400px;
+}
+
+.align_right{
+text-align:right;
+
+}
+
 #page_links{
 	margin:10px;
 	padding:5px;
 }
+
+.pagination_dropdown{
+
+}
+
+#profile_box{
+	float:left;
+	max-width:400px;
+}
+
+#permissions_box{
+max-width: 400px;
+padding:10px;
+padding-left:30px;
+margin-left:40%;
+background-color:lightgray;
+	}
+
+

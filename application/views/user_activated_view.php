@@ -1,4 +1,4 @@
-<?php include("header.php"); ?>
+<div id="container" class="container-fluid">
 
 
 <h1><?php echo $page_header; ?></h1>
@@ -8,7 +8,5 @@
 </div>
 </div>
 
-</body>
-</html>
 
 

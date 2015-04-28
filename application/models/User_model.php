@@ -1,12 +1,82 @@
 <?php
 /*
- * Filename : User_model.php
+ * Filename : models/User_model.php
  * Author : BEJAN NOURI
  * Date : 7-2-2014
  * Summary: Access data related to the User controller and the Profile controller
  * */
 
 class User_model extends CI_Model {
+	
+public function user_record_count() {
+		return $this->db->count_all("user");
+	}
+	
+public function sort_by($sort_by){
+		switch($sort_by){
+					case 1: return $this->db->order_by("last","asc");
+					case 2: return $this->db->order_by("last","desc");
+					case 3: return $this->db->order_by("email","asc");
+					case 4: return $this->db->order_by("email","desc");
+					case 5: return $this->db->order_by("status","asc");
+					case 6: return $this->db->order_by("status","desc");
+					case 7: return $this->db->order_by("locked","asc");
+					case 8: return $this->db->order_by("locked","desc");
+					case 9: return $this->db->order_by("created","asc");
+					case 10: return $this->db->order_by("created","desc");
+					case 11: return $this->db->order_by("last_updated","asc");
+					case 12: return $this->db->order_by("last_updated","desc");
+					default : return NULL;			
+			}		
+		}
+	
+public function get_all_users(){
+		$query = $this->db->get("user");
+		if ($query->num_rows() > 0) {
+				foreach($query->result() as $row){
+					$data[] = $row;
+			}
+			return $data;
+		}
+		return false;	
+	}
+
+public function get_all_users_paginated($limit, $start, $sort_by){
+		$this->sort_by($sort_by);		
+		$this->db->limit($limit,$start);
+		$query = $this->db->get("user");
+		if ($query->num_rows() > 0) {
+				foreach($query->result() as $row){
+					$data[] = $row;
+			}
+			return $data;
+		}
+		return false;	
+	}
+	
+public function get_all_active_users_paginated($limit, $start, $sort_by){
+		$this->sort_by($sort_by);		
+		$this->db->limit($limit,$start);
+		$this->db->where('status','ACTIVE');
+     $query = $this->db->get("user");
+		if ($query->num_rows() > 0) {
+				foreach($query->result() as $row){
+					$data[] = $row;
+			}
+			return $data;
+		}
+		return false;	
+	}
+
+public function delete_user($id){
+		$this->db->where('id',$id);
+		if($this->db->delete('user')){
+			$this->unlink_all_roles_to_user($id);
+		    return true;
+		}else{
+			return false;
+		}
+	}
 
 public function can_log_in(){
 		$email = $this->input->post('email');
@@ -128,7 +198,6 @@ if($this->db->affected_rows() >0){
 					return false;
 				}
 } 
-
 public function register_new_user($data){
 			$user_data = array(
 								'first'=>$this->input->post('first'),
@@ -136,6 +205,7 @@ public function register_new_user($data){
 								'email'=>$this->input->post('email'),
 								'password'=>md5($this->input->post('password')),
 								'created'=>date("Y-m-d H:i:s"),
+								'last_updated'=>date("Y-m-d H:i:s"),
 								'status' => 'PENDING',
 								'locked' => 0
 			);
@@ -147,7 +217,21 @@ public function register_new_user($data){
 				return false;         
 	         }
 	}
-
+	
+public function create_new_user($user_data){
+	  $add_data = array(
+							  'created'=>date("Y-m-d H:i:s"),
+								'last_updated'=>date("Y-m-d H:i:s"),
+								'locked' => 0	  
+	  );	
+	  $data =array_merge($user_data, $add_data);
+	  $this->db->insert('user',$data);
+	   if($this->db->affected_rows() > 0){
+	         return true;
+	         }else{
+				return false;         
+	         }
+	}	
 public function confirm_key($key, $return_values){
 		$this->db->where('temp_key', $key);
 		$query = $this->db->get('temp_user');		
@@ -182,8 +266,7 @@ public function activate_new_user($key){
 	$this->db->delete('temp_user', array('temp_key' => $key));
 	$user_data = $this->get_user_data($email);
 	$id = $user_data['id'];
-	$profile_data = array('user_id'=>$id);
-	$this->db->insert('user_profile',$profile_data);
+	$this->create_new_profile ($id);
 	return true;	
 	}else{
 	return false;
@@ -199,6 +282,23 @@ public function get_user_data($email){
  		$user_data['last']= $row->last;
  		$user_data['created']= $row->created;
  		$user_data['last_updated']= $row->last_updated; 
+ 		$user_data['id']= $row->id;
+ }
+ $id = $user_data['id'];
+ $user_data['permissions'] = $this->get_user_permissions($id);
+ return $user_data;
+ }
+ 
+ public function get_user($id){
+ $this->db->where('id', $id);
+ $query = $this->db->get('user');
+ foreach($query->result() as $row){
+ 		$user_data['email']= $row->email;
+ 		$user_data['first']= $row->first;
+ 		$user_data['last']= $row->last;
+ 		$user_data['created']= $row->created;
+ 		$user_data['last_updated']= $row->last_updated; 
+ 		$user_data['status']= $row->status;
  		$user_data['id']= $row->id;
  }
  return $user_data;
@@ -244,8 +344,30 @@ public function update_user_data(){
 				return false;         
 	         }
 	}
+
+public function update_user_value($data, $id){
+			$this->db->where('id', $id);
+			$this->db->update('user', $data);
+         if($this->db->affected_rows() > 0){
+	         return true;
+	         }else{
+				return false;         
+	         }
+	}
 	
-public function update_user_profile(){
+public function create_new_profile($id){
+		$profile_data = array(
+		    'user_id'=>$id
+		    );
+		$this->db->insert('user_profile',$profile_data);	
+		 if($this->db->affected_rows() > 0){
+		  return true;
+		  }else{
+			return false;         
+			}
+	}
+	
+public function update_user_profile($id){
 			$profile_data = array(
 								'address1'=>$this->input->post('address1'),
 								'address2'=>$this->input->post('address2'),
@@ -260,31 +382,13 @@ public function update_user_profile(){
 								'company_name'=>$this->input->post('company_name'),
 								'website'=>$this->input->post('website'),						
 								'last_updated'=>date("Y-m-d H:i:s")
-			);
-			$user_data = $this->get_user_data($this->session->userdata('email'));
-			$id = $user_data['id'];
+			);			
 			$this->db->where('user_id', $id);
-         $this->db->update('user_profile', $profile_data);
+       $this->db->update('user_profile', $profile_data);
          if($this->db->affected_rows() > 0){
 	         return true;
 	         }else{
 				return false;         
-	         }
-	}
-
-public function update_user_profile_city(){
-			$profile_data = array(
-								'city'=>$this->input->post('city'),
-								'last_updated'=>date("Y-m-d H:i:s")
-			);
-			$user_data = $this->get_user_data($this->session->userdata('email'));
-			$id = $user_data['id'];
-			$this->db->where('user_id', $id);
-         $this->db->update('user_profile', $profile_data);
-         if($this->db->affected_rows() > 0){
-	         return true;
-	         }else{
-			  return false;         
 	         }
 	}
 	
@@ -319,5 +423,92 @@ public function activate_new_password($key){
 		 }	
 	}
 	
+public function get_user_permissions($id){
+	$this->db->select('permission_id');
+	$this->db->from('xref_roles_permissions');
+	$this->db->join('xref_user_roles','xref_user_roles.role_id = xref_roles_permissions.role_id','left');
+	$this->db->join('roles','roles.id = xref_user_roles.role_id', 'left');
+	$this->db->where ('roles.status','ACTIVE');
+	$this->db->where('xref_user_roles.user_id', $id);
+	$this->db->distinct();
+  $query = $this->db->get();
+  $permissions = array();
+   foreach ($query->result() as $row){
+   $permissions[] = $row;  
+   }
+  $active_permissions = $this->verify_active_permissions($permissions);
+  	return $active_permissions;
+}
+
+public function verify_active_permissions($permissions){
+$active_permissions = array();
+foreach($permissions as $value){
+$this->db->select('id');
+$this->db->from('permissions');
+$this->db->where('id',$value->permission_id);
+$this->db->where('status', 'ACTIVE');
+$query = $this->db->get();
+foreach($query->result() as $row){
+$active_permissions[] = $row;
+}}	
+	return $active_permissions; 
+
+}
+	
+public function list_user_roles($id){
+	    $this->db->select('*');
+        $this->db->from('xref_user_roles');
+        $this->db->where('user_id', $id);
+        $this->db->join('user', 'xref_user_roles.user_id = user.id');
+        $this->db->join('roles', 'xref_user_roles.role_id = roles.id');
+        $this->db->order_by('roles.role', 'desc');
+        $query = $this->db->get();
+        $data = array();
+        foreach ($query->result() as $row) {
+        $data[] = $row;
+        }
+        return $data;
+	}
+		
+public function link_user_roles($user_id, $role_id){
+		$data = array(			
+		   'user_id'=>$user_id,
+			 'role_id'=>$role_id
+		);
+	  $this->db->insert("xref_user_roles", $data);
+		if($this->db->affected_rows() > 0){
+	         return true;
+	         }else{
+			 return false;         
+	         }
+	}
+	
+public function unlink_user_roles($user_id, $role_id){
+	    if($this->db->delete('xref_user_roles', array('user_id' => $user_id, 'role_id' => $role_id))){
+		    return true;
+		}else{
+			return false;
+		}
+	}
+
+public function unlink_all_roles_to_user($user_id){
+		$this->db->where('user_id', $user_id);
+		if($this->db->delete('xref_user_roles')){
+		    return true;
+		}else{
+			return false;
+		}
+	}
+	
+public function link_multiple_roles_to_user($user_id, $roles){
+	 	foreach ($roles as $value){
+	 		$this->link_user_roles($user_id, $value);
+	 	}
+	 	if($this->db->affected_rows() > 0) {
+	 		return true;	 	
+	 	}else{
+	 	return false;
+	 	}	 
+	 }
 
 }

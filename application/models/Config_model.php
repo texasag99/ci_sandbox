@@ -8,6 +8,32 @@
 
 class Config_model extends CI_Model {
 
+
+public function get_all_settings(){
+		$query = $this->db->get("config");
+		if ($query->num_rows() > 0) {
+				 foreach($query->result() as $row){
+				 		$data['from_email']= $row->from_email;
+				 		$data['from_name']= $row->from_name;
+				 		$data['retry_limit']= $row->retry_limit;
+				 		$data['default_pagination']= $row->default_pagination;
+				 		}
+			return $data;
+		}
+		return false;	
+	}
+
+
+public function update_config($id,$data)	{
+	  $this->db->where ('Id',$id);
+	  $this->db->update('config', $data);
+         if($this->db->affected_rows() > 0){
+	         return true;
+	         }else{
+				return false;         
+	         }
+}
+
 public function get_from_email()	{
 $query = $this->db->get('config');
  foreach($query->result() as $row){

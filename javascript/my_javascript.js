@@ -1,20 +1,34 @@
 
 //$.fn.editable.defaults.mode = 'inline';
 
-$(document).ready(function(){
-	$('.editable').editable();
-	$('.editable_status').editable({
-		type: 'select', 
-        source: [
-              {value: 'Active', text: 'Active'},
-              {value: 'Inactive', text: 'Inactive'}
-           ]
-   		 });
-	
+$(document).ready(function(){	
 	$('#header').fadeTo(4000,0.25); //FADES THE HEADER
-    $('input').addClass('form-control'); //ADD CLASS TO FORM INPUTS
-	$('select').addClass('form-control'); //ADD CLASS TO FORM INPUTS 
-	
+   $('input').addClass('form-control'); //ADD CLASS TO FORM INPUTS
+	$('select').addClass('form-control'); //ADD CLASS TO FORM DROPDOWNS
+   $('.multi-select').multiselect({
+					buttonWidth: '500px',
+					buttonClass: 'btn btn-default',
+					 buttonText: function(options, select) {
+								if (options.length === 0) {
+									return 'None selected...';
+								}
+									else if (options.length > 3) {
+									return 'More than 3 selected';
+								}
+									else {
+									var labels = [];
+									options.each(function() {
+								if ($(this).attr('label') !== undefined) {
+									labels.push($(this).attr('label'));
+								}
+									else {
+									labels.push($(this).html());
+										}
+									});
+									return labels.join(', ') + '';
+									}
+								}
+				});//makes dropdown multiple select lists work properly
 
 
 	$('#paginate').change(function() { 
@@ -23,7 +37,7 @@ $(document).ready(function(){
         
     });
 	
-	$('#delete_role').click(function(){//Used to display the delete confirmation message on the website.
+	$('#delete_message').click(function(){//Used to display the delete confirmation message on the website.
 		if (!confirm("Do you want to delete?")){
 			return false;
 		}

@@ -13,23 +13,6 @@ This is the "User" controller which manages everything related to user functiona
 - set user session data
 - initial user registration and setup
 - forgot my password [TBD]
-
-Functions include:
-1. index()
-2. login()
-3. logout()
-3. login_validation() - for validating the login credentials
-4. registration() - call the initial registration/user setup page
-5. registration_validation() - validate the registration values
-6. confirm_registration($key) - confirms the user after they have selected the link in the email they receive
-7. validate_credentials () - used during the login validation as a callback procedure...this confirms the user password is correct, the user isn't locked_out, the user is "ACTIVE"
-8. change_password() - loads the page for changing the user password
-9. password_validation() - validates the values passed in the change password form
-10.  verify_password() - Used during the password validation  as a callback procedure to verify s the current password
-11. confirm_password($key) - confirms the new password after the user has selected the link in the email.
-12. error_message($error) - loads the standard error page, when an error is called by another function.
-13. restricted() - loads the standard restricted access page, when someone tries to access something that is restricted.
-
 */
 
 class User extends CI_Controller {
@@ -41,7 +24,11 @@ public function index(){
 public function login(){
 		$data['title']='Login';
 		$data['page_header']='Login';
+		$this->load->view("header",$data);
+		$this->load->view("navbar",$data);
 		$this->load->view('login_view',$data);
+		$this->load->view("footer",$data);
+		
 	}
 
 public function logout(){
@@ -55,15 +42,17 @@ public function login_validation(){
 		$this->form_validation->set_rules('password', 'Password', 'required|md5|trim');
 		if($this->form_validation->run())	{
 			   $this->load->model('User_model');
-			   $user_data = $this->User_model->get_user_data($this->input->post('email'));
+			   $user_data = $this->User_model->get_user_data($this->input->post('email'));			   
+			   $permissions = $user_data['permissions'];	
 			   $name = $user_data['first'].' '.$user_data['last'];
 			   $data = array(
 						'email' => $this->input->post('email'),
 						'is_logged_in' => 1,
-						'name' => $name			
+						'name' => $name,
+						'permissions' => $permissions			
 				);
 			$this->session->set_userdata($data);
-			redirect('Profile');
+		redirect('Profile');
 		   }else{
 			   $this->login();					
 		   }
@@ -72,7 +61,10 @@ public function login_validation(){
 public function registration(){
 	$data['title']="Site Registration";
 	$data['page_header']="Site Registration";
+	$this->load->view("header",$data);
+	$this->load->view("navbar",$data);
 	$this->load->view('registration_view',$data);
+	$this->load->view("footer",$data);
 }
 
 public function registration_validation(){
@@ -112,7 +104,6 @@ public function registration_validation(){
 							echo "There is a problem inserting the new user information in the database";
 						}	 
 			   }else{ //Else if the form is not valid...they didn't enter a field properly or user already exists. Then reload the registration page with the errors.
-						
 						$this->registration();
 			}
 }
@@ -123,8 +114,11 @@ public function confirm_registration($key){
 	if ($this->User_model->confirm_key($key, $return_values)){
 		if ($this->User_model->activate_new_user($key)){
 			$data['title']="User Activated!";
-			$data['page_header']="You have successfully activated your account!"	;		
-			$this->load->view('user_activated_view',$data);		
+			$data['page_header']="You have successfully activated your account!"	;	
+			$this->load->view("header",$data);
+		  $this->load->view("navbar",$data);	
+			$this->load->view('user_activated_view',$data);
+			$this->load->view("footer",$data);				
 		}else {
 			   $error = "<p><span id='error'>There is a problem with activating the new user. </span> Please contact the system administrator</p>";
 				$this->error_message($error);
@@ -160,7 +154,10 @@ public function validate_credentials(){
 public function forgot_my_password(){
 	$data['title']="Forgot My Password";
 	$data['page_header']="Forgot My Password";
+	$this->load->view("header",$data);
+	$this->load->view("navbar",$data);
 	$this->load->view('fmp_view',$data);
+	$this->load->view("footer",$data);
 }
 
 public function fmp_email_validation(){
@@ -223,6 +220,7 @@ public function ajax_verify($type, $value){
 		}	
 	}
 }
+
 public function fmp_confirm($key){
   $this->load->model('User_model');
   $return_values = true;
@@ -233,7 +231,10 @@ public function fmp_confirm($key){
 		$data['page_header'] = 'Enter new password';
 		$data['key'] = $key;
 		$data['email'] = $temp_data ['email'];
+		$this->load->view("header",$data);
+		$this->load->view("navbar",$data);
 		$this->load->view('fmp_createpassword_view', $data);
+		$this->load->view("footer",$data);		
 	} else{
 	$this->session->sess_destroy();
    $error = "<p><span id='error'>The activation key is not valid!</span> <br><br> Did you already activate the password?<br><br>
@@ -285,7 +286,10 @@ public function change_password(){
 					$view_data['title']="Change My Password";
 					$view_data['page_header']= "Change password for: <strong>".$user_data['first']." ".$user_data['last']."</strong>";
 					$data= array_merge($view_data, $user_data);
-					$this->load->view('password_change_view',$data);	
+					$this->load->view("header",$data);
+					$this->load->view("navbar",$data);
+					$this->load->view('password_change_view',$data);
+					$this->load->view("footer",$data);	
 			}else{
 		      redirect ('User/restricted');	
 			}
@@ -360,7 +364,9 @@ public function confirm_password($key){
 	} 
 }
 	
-/* public function error_message($error){
+/* 
+ALL OF THIS WAS MOVED TO THE BASE CI_Controller  {base_url}/system/core/controller.php
+public function error_message($error){
          $data['title']="There is a problem with the User controller!";
 	      $data['page_header']="<span id='error'>There is a problem!</span>";
 	      $data['error_message']= $error;
@@ -369,10 +375,14 @@ public function confirm_password($key){
  
  public function restricted(){
 			$this->session->sess_destroy();//if the user attempts to access a restricted area...destroy the session
-	      $data['title']="There is a problem!";
-	      $data['page_header']="There is a problem!";
-	      $data['error_message']="<span style='color:maroon; font-size:2em; font-weight:bold;'>Restricted Access!</span><br><br>You have attempted to access an area that is restricted.";
+	     $data['title']="There is a problem!";
+	     $data['page_header']="There is a problem!";
+	     $data['error_message']="<span style='color:maroon; font-size:2em; font-weight:bold;'>Restricted Access!</span><br><br>You have attempted to access an area that is restricted.";
+			$this->load->view("header",$data);
+		  $this->load->view("navbar",$data);	
 			$this->load->view('There_is_a_problem_view',$data);
+			$this->load->view("footer",$data);
+		  
 	}
 
 

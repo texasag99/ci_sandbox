@@ -54,7 +54,7 @@ class CI_Controller {
 	 */
 	public function __construct()
 	{
-		self::$instance =& $this;
+    	self::$instance =& $this;
 
 		// Assign all the class objects that were instantiated by the
 		// bootstrap file (CodeIgniter.php) to local class variables
@@ -67,6 +67,7 @@ class CI_Controller {
 		$this->load =& load_class('Loader', 'core');
 		$this->load->initialize();
 		log_message('debug', 'Controller Class Initialized');
+		$this->benchmark->mark('code_start');		
 	}
 
 	// --------------------------------------------------------------------
@@ -82,7 +83,11 @@ class CI_Controller {
 		$data['title']="There is a problem with the controller!";
 		$data['page_header']="<span id='error'>There is a problem!</span>";
 		$data['error_message']= $error;
-		$this->load->view('There_is_a_problem_view',$data); 
+		$this->load->view("header",$data);
+		$this->load->view("navbar",$data);	
+		$this->load->view('There_is_a_problem_view',$data);
+		$this->load->view("footer",$data);
+		  	 
  	}
 	
 	

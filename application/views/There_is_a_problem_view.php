@@ -1,11 +1,11 @@
-<?php include("header.php"); 
+<?php
 if(ISSET($_SERVER['HTTP_REFERER'])){
 	$go_back_url = $_SERVER['HTTP_REFERER'];
 }else{ 
     $go_back_url = base_url().'User/login';
 }
 ?>
-
+<div id="container" class="container-fluid">
 <h1><?php echo $page_header; ?></h1>
 
 <div id="body">
@@ -22,7 +22,5 @@ if(ISSET($_SERVER['HTTP_REFERER'])){
 <p></p>
 </div>
 
-</body>
-</html>
 
 

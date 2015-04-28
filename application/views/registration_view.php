@@ -1,4 +1,4 @@
-<?php include("header.php"); 
+<?php
 if(ISSET($_SERVER['HTTP_REFERER'])){
 	$go_back_url = $_SERVER['HTTP_REFERER'];
 }else{ 
@@ -6,7 +6,7 @@ if(ISSET($_SERVER['HTTP_REFERER'])){
 }
 ?>
 
-
+<div id="container" class="container-fluid">
 	<h1><?php echo $page_header; ?></h1>
 
 	<div id="body">
@@ -63,7 +63,5 @@ echo form_close();
 </div>
 </div>
 
-</body>
-</html>
 
 

@@ -1,6 +1,4 @@
-<?php include("header.php"); ?>
-
-
+<div id="container" class="container-fluid">
 <h1><?php echo $page_header; ?></h1>
 
 <div id="body">
@@ -27,7 +25,5 @@ echo form_close();
 </div><!--body-->
 </div>
 </div>
-</body>
-</html>
 
 
