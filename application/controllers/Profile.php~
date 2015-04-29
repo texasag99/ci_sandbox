@@ -16,6 +16,7 @@ public function view_profile(){
 					$id = $user_data['id'];
 					$row = $user_data['permissions'];
 					$permission = array();
+					$counter = 0;
 					foreach($row as $value){
 						 $permission[] =$this->Roles_permissions_model->get_permission($value->id);						
 						}

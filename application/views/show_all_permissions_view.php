@@ -1,7 +1,9 @@
 <div id="container" class="container-fluid">
 <div id="body">
 <h1><?php echo $page_header; ?></h1>
-<a href='<?php echo base_url()."Permissions/add"; ?>' class="btn btn-default">Create permission</a> &nbsp;&nbsp;
+<?php if($allow_add){
+	echo"<a href='<?php echo base_url().\"Permissions/add\"; ?>' class=\"btn btn-default\">Create permission</a> &nbsp;&nbsp;";
+}?>
 <?php   
 if(isset($message) && !empty($message)){
 echo "<p>$message</p>";
@@ -17,8 +19,8 @@ echo "<p>$message</p>";
 		<th class='permission_status_column'>Status</th>
 		<th class='permission_column'>Category</th>
 		<th class='permission_created_column'>Created On</th>
-		<th class='permission_updated_column'>Last Updated</th>		
-		<th class='edit_button_column'></th>
+		<th class='permission_updated_column'>Last Updated</th>	
+<?php if($allow_edit || $allow_delete){ echo "<th class='edit_button_column'></th>"; } ?>	
 	</tr>
 </thead>
 <tbody class="table-hover">
@@ -33,7 +35,7 @@ echo "<p>$message</p>";
 	echo"<td class='permission_category_column'><a href='#' id='category' class='editable' data-type='select' name='category' data-pk='".$data->id."' data-url='".base_url()."Permissions/postValue/".$data->id."/category' data-title='Enter Category'>".$data->category."</a></td>";
 	echo"<td class='permission_created_column'>".date('m-d-Y', strtotime($data->created))."</td>";
 	echo"<td class='permission_updated_column'>".date('m-d-Y', strtotime($data->last_updated))."</td>";
-		
+		if($allow_edit){
 		?>
 <script>
 		$(function(){ 
@@ -48,10 +50,14 @@ echo "<p>$message</p>";
  
 </script>
 	<?php
+		
 		echo"<td><a href='".base_url()."Permissions/update/".$data->id."' class='btn btn-default' id='edit_permission".$data->id."' style='margin:1px;'><span class='glyphicon glyphicon-edit' style='font-size:16px;'></span></a>";
+		}
+		if($allow_delete){
 		echo"<a href='#' class='btn btn-default' id='delete_permission".$data->id."' style='margin:1px;'><span class='glyphicon glyphicon-remove' style='font-size:16px;'></span></a></td></tr>";
 		//below is the script for the pop-up dialog box to confirm the item delete.
 		echo"<script>$('#delete_permission".$data->id."').click(function(){bootbox.dialog({title:\"Confirm Deletion\", message:\"<p style='text-align:center'>Are you sure?<br><br><a class='btn btn-warning' href='".base_url()."Permissions/delete/".$data->id."'>Delete</a></p>\"}); });</script>";
+    }	
 	}
 	?>
 </tbody>

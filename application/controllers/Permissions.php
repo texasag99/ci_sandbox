@@ -102,6 +102,7 @@ public function show_all_permissions_paginated($pagination_config){
 		$data ["links"] = $this->pagination->create_links();
 	  $default_pagination= $this->Config_model->get_default_pagination();
 	  $view_data['per_page'] = ($this->uri->segment(4))? $this->uri->segment(4) : $default_pagination;	
+	  $view_data['allow_add'] = $this->has_permission_to_add();
 	  $view_data['allow_edit'] = $this->has_permission_to_edit();
 	  $view_data['allow_delete'] = $this->has_permission_to_delete();
 		$view_data['title']="Permissions";
@@ -120,6 +121,9 @@ public function show_all_permissions(){
 		$data["results"] = $this->Roles_permissions_model->get_all_permissions();
 		$view_data['title']="permissions";
 		$view_data['page_header']= "All permissions";
+		$view_data['allow_add'] = $this->has_permission_to_add();
+		$view_data['allow_delete'] = $this->has_permission_to_delete();
+		$view_data['allow_edit'] = $this->has_permission_to_edit();
 		$data= array_merge($view_data, $data);
 		$this->load->view("header",$data);
 		$this->load->view("navbar",$data);

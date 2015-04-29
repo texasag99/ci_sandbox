@@ -301,7 +301,6 @@ public function get_user_data($email){
  		$user_data['status']= $row->status;
  		$user_data['id']= $row->id;
  }
- $user_data['permissions'] = $this->get_user_permissions($id);
  return $user_data;
  }
  

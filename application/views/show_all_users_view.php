@@ -84,7 +84,7 @@ echo "<p>$message</p>";
 			$locked = "Yes";
 			}
 		echo"<tr><td class='user_column'><a href='#' class='editable' id='first' data-type='text' name='first' data-pk='".$data->id."' data-url='".base_url()."UserAdmin/postValue/".$data->id."/first' data-title='Enter the user's first name'>".$data->first."</a> ";
-		echo"<a href='#' class='editable' id='last' data-type='text' name='last' data-pk='".$data->id."' data-url='".base_url()."UserAdmin/postValue/".$data->id."/last' data-title='Enter the user's last name'>".$data->last."</a></td>";
+		echo"<a href='#' class='editable' id='last' data-type='text' name='last' data-pk='".$data->id."' data-url='".base_url()."UserAdmin/postValue/".$data->id."/last' data-title='Enter the user's last name'>".$data->last."</a> <a href='#' id='show_user".$data->id."'><span class='glyphicon glyphicon-list-alt'></span></a></td>";
 		echo"<td class='user_email_column'><a href='#' class='editable' id='email' data-type='text' name='email' data-pk='".$data->id."' data-url='".base_url()."UserAdmin/postValue/".$data->id."/email' data-title='Enter a valid email'>".$data->email."</a></td>";
 		echo"<td class='user_status_column'><a href='#' id='status' class='status_editable_".$counter."' data-type='select' name='status' data-pk='".$data->id."' data-url='".base_url()."UserAdmin/postValue/".$data->id."/status' data-title='Select Status'>".$data->status."</a></td>";
 		echo"<td class='user_locked_column'><a href='#' id='locked' class='locked_editable_".$counter."' data-type='select' name='locked' data-pk='".$data->id."' data-url='".base_url()."UserAdmin/postValue/".$data->id."/locked' data-title='Is locked?'>".$locked."</a></td>";
