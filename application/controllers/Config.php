@@ -15,7 +15,8 @@ class Config extends CI_Controller {
 
 public function __construct(){
 	parent::__construct();
-	$this->load->model('Config_model');	
+	$this->load->model('Config_model');
+	$this->load->model('Audit_model');	
 }
 
 public function index(){
@@ -55,6 +56,8 @@ public function show_configuration(){
    	$data['allow_edit'] = $this->has_permission_to_edit();   	
    	$data['title']="Global Settings";
 		$data['page_header']="Global Settings";
+		$audit = array('primary' => 'CNFG', 'secondary'=>'VIEW', 'status'=>true,  'controller'=>'Config', 'value'=>null,  'extra_1' =>'view_user_profile', 'extra_2'=>null, 'extra_3'=>null);
+		$this->Audit_model->log_entry($audit);
 		$this->load->view("header",$data);
 		$this->load->view("navbar",$data);
 		$this->load->view('show_global_settings',$data);
@@ -65,25 +68,46 @@ public function show_configuration(){
 }
 
 public function postValue($id, $column){	//FOR INLINE EDITS
+  if($this->session->userdata('is_logged_in')){		
 	$this->load->library('form_validation');
 	if($column=='from_email'){$this->form_validation->set_rules('value', 'Administrator Email', 'required|trim|valid_email');}
 	if($column=='from_name'){$this->form_validation->set_rules('value', 'Administrator Name or Title', 'required|max_length[100]|trim');}
-	if($column=='retry_limit'){$this->form_validation->set_rules('value', 'Limit', 'required|trim');}
+	if($column=='retry_limit'){$this->form_validation->set_rules('value', 'Password Retry Limit', 'required|trim');}
 	if($column=='default_pagination'){$this->form_validation->set_rules('value', 'Default Pagination', 'required|trim');}
-	if ($this->form_validation->run() && $this->has_permission_to_edit()){
+	if($column=='reset_pwd_days'){$this->form_validation->set_rules('value', 'Days to Require Password Change', 'required|trim|less_than[731]|greater_than[-1]');}
+	if($column=='allow_registration'){$this->form_validation->set_rules('value', 'Allow Open Registration', 'required|trim');}
+  if ($this->form_validation->run() && $this->has_permission_to_edit()){ 
+  
 		if($column=='from_email'){$data = array('from_email'=>$this->input->post('value')); }
 		if($column=='from_name'){$data = array('from_name'=>$this->input->post('value'));}
 		if($column=='retry_limit'){$data = array('retry_limit'=>$this->input->post('value'));}
 		if($column=='default_pagination'){$data = array('default_pagination'=>$this->input->post('value'));}
+		if($column=='reset_pwd_days'){$data = array('reset_pwd_days'=>$this->input->post('value'));}
+		if($column=='allow_registration'){$data = array('allow_registration'=>$this->input->post('value'));}
 		if($this->Config_model->update_config($id, $data)){
+			$audit_value = json_encode($this->input->post());
+			$audit = array('primary' => 'CNFG', 'secondary'=>'UPDT', 'status'=>true,  'controller'=>'Config', 'value'=>$audit_value,  'extra_1' =>$column, 'extra_2'=>null, 'extra_3'=>null);
+ 			$this->Audit_model->log_entry($audit);
 			http_response_code(200);
 		}else{
+			$audit_value = json_encode($this->input->post());
+			$audit = array('primary' => 'CNFG', 'secondary'=>'UPDT', 'status'=>false,  'controller'=>'Config', 'value'=>$audit_value,  'extra_1' =>$column, 'extra_2'=>'database update error', 'extra_3'=>null);
+ 			$this->Audit_model->log_entry($audit);
 			http_response_code(400);
 			echo "The database didn't update";
 		}}else{
-		http_response_code(400);
-		 echo strip_tags(validation_errors());
-	}
+		 http_response_code(400);
+		 $audit_value = json_encode($this->input->post());
+		 $audit = array('primary' => 'CNFG', 'secondary'=>'UPDT', 'status'=>false,  'controller'=>'Config', 'value'=>$audit_value,  'extra_1' =>$column, 'extra_2'=>'validation error', 'extra_3'=>null);
+ 		 $this->Audit_model->log_entry($audit);
+	    echo strip_tags(validation_errors());
+	}}else{
+		   $audit_value = json_encode($this->input->post());
+			$audit = array('primary' => 'CNFG', 'secondary'=>'UPDT', 'status'=>false,  'controller'=>'Config', 'value'=>$audit_value,  'extra_1' =>$column, 'extra_2'=>'timeout error', 'extra_3'=>null);
+ 			$this->Audit_model->log_entry($audit);
+			http_response_code(400);
+	   	echo "The session timed out";
+		}
 }
 
 

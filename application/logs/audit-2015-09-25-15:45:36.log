@@ -1,0 +1,8 @@
+Audit file created on : 2015-09-25-15:45:36
+
+2015-09-25 15:45:34| 00000000217| AUDT| VIEW| bejan.nouri@gmail.com| 192.168.10.52| 1| d38de1bc9a8516ae1d375bbeff3c42df| Audit| 
+2015-09-25 15:45:31| 00000000216| PERM| VIEW| bejan.nouri@gmail.com| 192.168.10.52| 1| d38de1bc9a8516ae1d375bbeff3c42df| Permissions| 
+2015-09-25 15:45:29| 00000000215| ROLE| VIEW| bejan.nouri@gmail.com| 192.168.10.52| 1| d38de1bc9a8516ae1d375bbeff3c42df| Roles| 
+2015-09-25 15:45:26| 00000000214| USRA| VIEW| bejan.nouri@gmail.com| 192.168.10.52| 1| d38de1bc9a8516ae1d375bbeff3c42df| UserAdmin| 
+2015-09-25 15:43:17| 00000000213| AUDT| VIEW| bejan.nouri@gmail.com| 192.168.10.52| 1| d38de1bc9a8516ae1d375bbeff3c42df| Audit| 
+2015-09-25 15:43:16| 00000000212| AUDT| TRUN| bejan.nouri@gmail.com| 192.168.10.52| 1| d38de1bc9a8516ae1d375bbeff3c42df| Audit/truncate_log| Cleared Log

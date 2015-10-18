@@ -1,16 +1,32 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 
+/* 
+filename: Roles.php
+Author: Bejan Nouri
+Last update: 8-1-2014
+
+Notes- 
+
+This is the "Roles" controller which manages everything related to roles functionality including:
+
+*/
+
 class Roles extends CI_Controller {
 
 public function __construct(){
 	parent::__construct();
 	$this->load->model("Roles_permissions_model");
 	$this->load->library('pagination');
-	$this->load->model('Config_model');	
+	$this->load->model('Config_model');
+	$this->load->model('Audit_model');		
 }
 
+public function index(){
+		$this-> show_all_roles_paginated(0, 0);
+	}
 
+/*************HAS PERMISSIONS*********************/
 private function has_permission_to_view(){
 	$all_permissions = $this->session->userdata('permissions');
 	$permission = array();
@@ -63,11 +79,7 @@ private function has_permission_to_add(){
     	}
 }
 
-public function index(){
-		$this-> show_all_roles_paginated(0, 0);
-	}
-
-
+/********************PAGINATION SETUP*********************************/
 public function pagination_setup(){		
 	$default_pagination= $this->Config_model->get_default_pagination();
 	$per_page = ($this->uri->segment(4))? $this->uri->segment(4) : $default_pagination;	
@@ -93,7 +105,7 @@ public function pagination_setup(){
 	$this->pagination->initialize($pagination_config);
 	return $pagination_config;	
 }	
-	
+/*********************SHOW ALL ROLES************************************/
 public function show_all_roles_paginated($pagination_config){
 	if ($this->session->userdata('is_logged_in') && $this->has_permission_to_view()){
 		$this->load->helper("url");
@@ -111,6 +123,8 @@ public function show_all_roles_paginated($pagination_config){
 		$view_data['title']="Roles";
 		$view_data['page_header']= "All Roles";
 		$data= array_merge($view_data, $data);
+		$audit = array('primary' => 'ROLE', 'secondary'=>'VIEW', 'status'=>true,  'controller'=>'Roles', 'value'=>null,  'extra_1' =>null, 'extra_2'=>null, 'extra_3'=>null);
+		$this->Audit_model->log_entry($audit);
 		$this->load->view("header",$data);
 		$this->load->view("navbar",$data);
 		$this->load->view("show_all_roles_view",$data);
@@ -119,7 +133,7 @@ public function show_all_roles_paginated($pagination_config){
 		      redirect ('User/restricted');	
 			}
 	} 
-
+	
 public function show_all_roles(){
 	if ($this->session->userdata('is_logged_in') && $this->has_permission_to_view()){
 		$data["results"] = $this->Roles_permissions_model->get_all_roles();
@@ -129,6 +143,8 @@ public function show_all_roles(){
 		$view_data['title']="Roles";
 		$view_data['page_header']= "All Roles";
 		$data= array_merge($view_data, $data);
+		$audit = array('primary' => 'ROLE', 'secondary'=>'VIEW', 'status'=>true,  'controller'=>'Roles', 'value'=>null,  'extra_1' =>null, 'extra_2'=>null, 'extra_3'=>null);
+		$this->Audit_model->log_entry($audit);
 		$this->load->view("header",$data);
 		$this->load->view("navbar",$data);
 		$this->load->view("show_all_roles_view",$data);
@@ -138,12 +154,18 @@ public function show_all_roles(){
 			}
 	}
 
+/*********************ADD, DELETE & UPDATE A ROLE***********************************/
 public function delete($id){
 	if ($this->session->userdata('is_logged_in') && $this->has_permission_to_delete()){
 		if ($this->Roles_permissions_model->delete_role($id)){
-			$pagination_config = $this->pagination_setup();
-			$this->show_all_roles_paginated($pagination_config);			
+			$audit = array('primary' => 'ROLE', 'secondary'=>'DELR', 'status'=>true,  'controller'=>'Roles', 'value'=>null,  'extra_1' =>'Delete the role', 'extra_2'=>null, 'extra_3'=>null);
+		   $this->Audit_model->log_entry($audit);
+			$message = "<div class='alert alert-info'  role='alert'><p><span class='glyphicon glyphicon-exclamation-sign'></span> <strong>Deleted!</strong> The role was deleted from the system.</p></div>";
+			$this->session->set_flashdata('message',$message);
+			redirect('Roles');	
 			}else{
+			$audit = array('primary' => 'ROLE', 'secondary'=>'DELR', 'status'=>false,  'controller'=>'Roles', 'value'=>null,  'extra_1' =>'Failed to delete the role', 'extra_2'=>null, 'extra_3'=>null);
+		   $this->Audit_model->log_entry($audit);
 			$error = "Unable to delete the role. Either it doesn't exist or there is something wrong with the database.";
 			$this->error_message($error);
 			}					
@@ -151,67 +173,62 @@ public function delete($id){
 		redirect ('User/restricted');	
 		}
 	} 
-		
-public function postValue($id, $column){	//FOR INLINE EDITSpublic function link_role_permission($role_id, $permission_id){
-	$this->load->library('form_validation');
-	if($column=='role'){
-		$this->form_validation->set_rules('value', 'Role name', 'required|trim|min_length[4]|max_length[16]|is_unique[roles.role]');
-		$this->form_validation->set_message('is_unique','The role already exists.');}
-	if($column=='description'){$this->form_validation->set_rules('value', 'Description', 'required|max_length[100]|trim');}
-	if($column=='status'){$this->form_validation->set_rules('value', 'Status', 'required|trim');}
-	if ($this->form_validation->run() && $this->has_permission_to_edit()){
-		if($column=='role'){$data = array('role'=>strtoupper($this->input->post('value'))); }
-		if($column=='description'){$data = array('description'=>$this->input->post('value'));}
-		if($column=='status'){$data = array('status'=>$this->input->post('value'));}
-		if ($this->Roles_permissions_model->update_role($data, $id)){
-			http_response_code(200);
-		}else{
-			http_response_code(400);
-			echo "The database didn't update";
-		}}else{
-		http_response_code(400);
-		 echo strip_tags(validation_errors());
-	}
-}
-
 public function add(){
 if ($this->session->userdata('is_logged_in') && $this->has_permission_to_add()){
 	$data['title']="Add a role";
 	$data['page_header']="Add a role";
+	$audit = array('primary' => 'ROLE', 'secondary'=>'ADDV', 'status'=>true,  'controller'=>'Roles', 'value'=>null,  'extra_1' =>null, 'extra_2'=>null, 'extra_3'=>null);
+	$this->Audit_model->log_entry($audit);
 	$this->load->view("header",$data);
 	$this->load->view("navbar",$data);
 	$this->load->view('add_role_view',$data);
 	$this->load->view("footer",$data);		
-}
+}else{
+		redirect ('User/restricted');	
+		}
 }
 
 public function add_validation(){
 if ($this->session->userdata('is_logged_in') && $this->has_permission_to_add()){
+	$audit_value = json_encode($this->input->post());
 	$this->load->library('form_validation');
 	$this->form_validation->set_rules('role', 'Role Name', 'required|trim|min_length[4]|max_length[16]|is_unique[roles.role]');
 	$this->form_validation->set_rules('description', 'Description', 'required|max_length[100]|trim');
 	$this->form_validation->set_rules('status', 'Status', 'required|trim');
 	$this->form_validation->set_message('is_unique',"The role already exists.");
-	if ($this->form_validation->run()){
+	if ($this->form_validation->run()){		
 			$data = array(
 			'role'=>strtoupper($this->input->post('role')),
 			'description'=>$this->input->post('description'),
 			'status'=>$this->input->post('status')
 			);
-		if($this->Roles_permissions_model->add_role($data)){
-			$this->index();
+		if($this->Roles_permissions_model->add_role($data)){			
+			$audit = array('primary' => 'ROLE', 'secondary'=>'ADD', 'status'=>true,  'controller'=>'Roles', 'value'=>$audit_value,  'extra_1' =>null, 'extra_2'=>null, 'extra_3'=>null);
+			$this->Audit_model->log_entry($audit);
+			$message = "<div class='alert alert-success'  role='alert'><p><span class='glyphicon glyphicon-ok'></span> <strong>Success!</strong> The new role was successfully added to the system.</p></div>";
+			$this->session->set_flashdata('message',$message);
+			 redirect('Roles');
 			}else{ 
-			echo "Failed to create the new role.";
+			$audit = array('primary' => 'ROLE', 'secondary'=>'ADD', 'status'=>false,  'controller'=>'Roles', 'value'=>$audit_value,  'extra_1' =>'failed to add the new role', 'extra_2'=>null, 'extra_3'=>null);
+			$this->Audit_model->log_entry($audit);
+			$message = "<div class='alert alert-warning'  role='alert'><p><span class='glyphicon glyphicon-exclamation-sign'></span> <strong>Failed!</strong>Failed to create the new role.</p></div>";
+			$this->session->set_flashdata('message',$message);
+			 redirect('Roles/add');			
 			}	
 	}else{
+	$audit = array('primary' => 'ROLE', 'secondary'=>'ADD', 'status'=>false,  'controller'=>'Roles', 'value'=>$audit_value,  'extra_1' =>'forms validation error', 'extra_2'=>null, 'extra_3'=>null);
+	$this->Audit_model->log_entry($audit);
 	$this->add();
 	}	 
-}
+}else{
+		redirect ('User/restricted');	
+		}
 }
 	
 public function update($id){
 if ($this->session->userdata('is_logged_in') && $this->has_permission_to_edit()){
 	$data['results']= $this->Roles_permissions_model->get_role($id);
+	$audit_value = json_encode($data['results']);
 	$lookup['selected_permissions'] = $this->Roles_permissions_model->list_role_permissions($id);
 	$lookup['active_permissions'] = $this->Roles_permissions_model->list_active_permissions();	
 	$active_permissions = array();
@@ -224,7 +241,8 @@ if ($this->session->userdata('is_logged_in') && $this->has_permission_to_edit())
 	foreach($lookup['selected_permissions'] as $permission){
 	$selected_permissions[] = $permission->permission_id;
 	}
-	$selecte_permission[5] = 1833;
+	$audit = array('primary' => 'ROLE', 'secondary'=>'UPDV', 'status'=>true,  'controller'=>'Roles', 'value'=>$audit_value,  'extra_1' =>null, 'extra_2'=>null, 'extra_3'=>null);
+	$this->Audit_model->log_entry($audit);
    $data['id'] = $id;
    $data['active']=$active_permissions;
    $data['selected']=$selected_permissions;
@@ -234,11 +252,14 @@ if ($this->session->userdata('is_logged_in') && $this->has_permission_to_edit())
 	$this->load->view("navbar",$data);
 	$this->load->view('edit_role_view',$data);
 	$this->load->view("footer",$data);
-}
+}else{
+		redirect ('User/restricted');	
+		}
 }
 
 public function update_validation(){
 if ($this->session->userdata('is_logged_in') && $this->has_permission_to_edit()){
+	$audit_value = json_encode($this->input->post());
 	$this->load->library('form_validation');
 	$this->form_validation->set_rules('role', 'Role Name', 'required|trim|min_length[4]|max_length[16]');
 	$this->form_validation->set_rules('description', 'Description', 'required|max_length[100]|trim');
@@ -253,31 +274,64 @@ if ($this->session->userdata('is_logged_in') && $this->has_permission_to_edit())
 			'description'=>$this->input->post('description'),
 			'status'=>$this->input->post('status')
 			);		
-		if($this->Roles_permissions_model->update_role($data, $id) && $this->Roles_permissions_model->link_multiple_permissions_to_role($id, $permissions)) {			
-			$this->index();
-			}else{ 
-			echo "Failed to update the new role.";
+		if($this->Roles_permissions_model->update_role($data, $id) && $this->Roles_permissions_model->link_multiple_permissions_to_role($id, $permissions)) {	
+			$audit = array('primary' => 'ROLE', 'secondary'=>'UPDT', 'status'=>true,  'controller'=>'Roles', 'value'=>$audit_value,  'extra_1' =>null, 'extra_2'=>null, 'extra_3'=>null);
+			$this->Audit_model->log_entry($audit);		
+			$message = "<div class='alert alert-success'  role='alert'><p><span class='glyphicon glyphicon-ok'></span> <strong>Success!</strong> The role was successfully updated in the system.</p></div>";
+			$this->session->set_flashdata('message',$message);
+			 redirect('Roles'); //SUCCESS 
+			}else{
+				$audit = array('primary' => 'ROLE', 'secondary'=>'UPDT', 'status'=>false,  'controller'=>'Roles', 'value'=>$audit_value,  'extra_1' =>'failed to update the role', 'extra_2'=>null, 'extra_3'=>null);
+				$this->Audit_model->log_entry($audit);		 
+				$message = "<div id='message'><div class='alert alert-warning'  role='alert'><p><span class='glyphicon glyphicon-exclamation-sign'></span><strong>Notice!</strong>Failed to update the role.</p></div></div>";
+				echo $message;
+				$this->update($id);
 			}	
 	}else{
+	$audit = array('primary' => 'ROLE', 'secondary'=>'UPDT', 'status'=>false,  'controller'=>'Roles', 'value'=>$audit_value,  'extra_1' =>'forms validation error', 'extra_2'=>null, 'extra_3'=>null);
+	$this->Audit_model->log_entry($audit);		
 	$this->update();
 	}
-}
+}else{
+		redirect ('User/restricted');	
+		}
 }
 
-private function link_role_permission($role_id, $permission_id){
-	if($this->Roles_permissions_model->link_role_permission($role_id, $permission_id)){
-		echo "You successfully linked permission_id: ".$permission_id." with role_id: ".$role_id;
-	}else{
-		echo "it didn't work";
-	}
+public function postValue($id, $column){	//FOR INLINE EDITSpublic function link_role_permission($role_id, $permission_id){
+   if($this->session->userdata('is_logged_in') && $this->has_permission_to_edit()){	
+   $audit_value = json_encode($this->input->post());	
+	$this->load->library('form_validation');
+	if($column=='role'){
+		$this->form_validation->set_rules('value', 'Role name', 'required|trim|min_length[4]|max_length[16]|is_unique[roles.role]');
+		$this->form_validation->set_message('is_unique','The role already exists.');}
+	if($column=='description'){$this->form_validation->set_rules('value', 'Description', 'required|max_length[100]|trim');}
+	if($column=='status'){$this->form_validation->set_rules('value', 'Status', 'required|trim');}
+	if ($this->form_validation->run() && $this->has_permission_to_edit()){
+		if($column=='role'){$data = array('role'=>strtoupper($this->input->post('value'))); }
+		if($column=='description'){$data = array('description'=>$this->input->post('value'));}
+		if($column=='status'){$data = array('status'=>$this->input->post('value'));}
+		if ($this->Roles_permissions_model->update_role($data, $id)){
+			$audit = array('primary' => 'ROLE', 'secondary'=>'UPDT', 'status'=>true,  'controller'=>'Role', 'value'=>$audit_value,  'extra_1' =>$column, 'extra_2'=>null, 'extra_3'=>null);
+ 			$this->Audit_model->log_entry($audit);
+			http_response_code(200);
+		}else{
+			$audit = array('primary' => 'ROLE', 'secondary'=>'UPDT', 'status'=>false,  'controller'=>'Role', 'value'=>$audit_value,  'extra_1' =>$column, 'extra_2'=>'database did not update properly', 'extra_3'=>null);
+ 			$this->Audit_model->log_entry($audit);
+			http_response_code(400);
+			echo "Database did not update properly";
+		}}else{
+		$audit = array('primary' => 'ROLE', 'secondary'=>'UPDT', 'status'=>false,  'controller'=>'Role', 'value'=>$audit_value,  'extra_1' =>$column, 'extra_2'=>'form validation error', 'extra_3'=>null);
+ 		$this->Audit_model->log_entry($audit);
+		http_response_code(400);
+		 echo strip_tags(validation_errors());
+	}}else{
+			$audit = array('primary' => 'ROLE', 'secondary'=>'UPDT', 'status'=>false,  'controller'=>'Role', 'value'=>$audit_value,  'extra_1' =>$column, 'extra_2'=>'timeout error', 'extra_3'=>null);
+ 			$this->Audit_model->log_entry($audit);
+			http_response_code(400);
+	   	echo "The session timed out";
+	   	}
 }
-	
-private function unlink_role_permission($role_id, $permission_id){
-	if($this->Roles_permissions_model->unlink_role_permission($role_id, $permission_id)){
-		echo "You successfully unlinked permission_id: ".$permission_id." with role_id: ".$role_id;
-	}else{
-		echo "it didn't work";
-	}
-}
+
+
 
 }

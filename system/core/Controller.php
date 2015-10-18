@@ -80,9 +80,12 @@ class CI_Controller {
 	 */
 	
 	 public function error_message($error){
+	 	$this->load->model('Audit_model');
 		$data['title']="There is a problem with the controller!";
 		$data['page_header']="<span id='error'>There is a problem!</span>";
 		$data['error_message']= $error;
+		$audit = array('primary' => 'SYS', 'secondary'=>'ERR', 'status'=>true,  'controller'=>null, 'value'=>$error,  'extra_1' =>'there was an error.', 'extra_2'=>null, 'extra_3'=>null);
+		$this->Audit_model->log_entry($audit);
 		$this->load->view("header",$data);
 		$this->load->view("navbar",$data);	
 		$this->load->view('There_is_a_problem_view',$data);

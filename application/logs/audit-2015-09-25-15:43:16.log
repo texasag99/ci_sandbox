@@ -1,0 +1,11 @@
+Audit file created on : 2015-09-25-15:43:16
+
+2015-09-25 15:43:12  |  00000000211  |  AUDT  |  VIEW  |  bejan.nouri@gmail.com  |  192.168.10.52  |  1  |  d38de1bc9a8516ae1d375bbeff3c42df  |  Audit  |  
+2015-09-25 15:43:10  |  00000000210  |  CNFG  |  VIEW  |  bejan.nouri@gmail.com  |  192.168.10.52  |  1  |  d38de1bc9a8516ae1d375bbeff3c42df  |  Config  |  
+2015-09-25 15:43:08  |  00000000209  |  PROF  |  VIEW  |  bejan.nouri@gmail.com  |  192.168.10.52  |  1  |  d38de1bc9a8516ae1d375bbeff3c42df  |  Profile  |  1
+2015-09-25 15:43:06  |  00000000208  |  USRA  |  VIEW  |  bejan.nouri@gmail.com  |  192.168.10.52  |  1  |  d38de1bc9a8516ae1d375bbeff3c42df  |  UserAdmin  |  
+2015-09-25 15:43:02  |  00000000207  |  PERM  |  VIEW  |  bejan.nouri@gmail.com  |  192.168.10.52  |  1  |  d38de1bc9a8516ae1d375bbeff3c42df  |  Permissions  |  
+2015-09-25 15:42:59  |  00000000206  |  ROLE  |  VIEW  |  bejan.nouri@gmail.com  |  192.168.10.52  |  1  |  d38de1bc9a8516ae1d375bbeff3c42df  |  Roles  |  
+2015-09-25 15:42:55  |  00000000205  |  PERM  |  VIEW  |  bejan.nouri@gmail.com  |  192.168.10.52  |  1  |  d38de1bc9a8516ae1d375bbeff3c42df  |  Permissions  |  
+2015-09-25 15:32:12  |  00000000204  |  AUDT  |  VIEW  |  bejan.nouri@gmail.com  |  192.168.10.52  |  1  |  08d528c4db450e46e58d99c5a89f1d3e  |  Audit  |  
+2015-09-25 15:32:11  |  00000000203  |  AUDT  |  TRUN  |  bejan.nouri@gmail.com  |  192.168.10.52  |  1  |  08d528c4db450e46e58d99c5a89f1d3e  |  Audit/truncate_log  |  Cleared Log

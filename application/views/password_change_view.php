@@ -11,7 +11,11 @@ if(ISSET($_SERVER['HTTP_REFERER'])){
 
 <div id="body">
 <div id="form_container_500">
-<a class="btn btn-default" href="<?php echo $go_back_url; ?>">Go Back!</a>
+<?php
+if(isset($required) && !empty($required)){echo $required;}
+?>
+<p></p>
+
  <h3>Please enter a new password!</h3>
  <p style="max-width:800px; border:1px solid dark-gray; background-color:silver; padding:10px;"></p>
 
@@ -32,7 +36,9 @@ echo form_password('password',$this->input->post('password'));
 echo "<label for='confirm_password'>Confirm Password:</label> ";
 echo form_password('confirm_password');
 
-echo '<br><button type="submit" class="btn btn-primary">Update</button>';
+echo '<br><a class="btn btn-warning" href="'.$go_back_url.'">Go Back</a>&nbsp;';
+echo '<button type="submit" class="btn btn-primary">Update</button>';
+
 		 
 echo form_close();
 

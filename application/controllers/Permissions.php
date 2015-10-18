@@ -1,19 +1,34 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 
+/* 
+filename: Permissions.php
+Author: Bejan Nouri
+Last update: 8-1-2014
+
+Notes- 
+
+This is the "Permission" controller which manages everything related to permissions functionality including:
+- add, delete and update all permissions on the system
+
+*/
+
+
 class Permissions extends CI_Controller {
 
 public function __construct(){
 	parent::__construct();
 	$this->load->model("Roles_permissions_model");
 	$this->load->library('pagination');
-	$this->load->model('Config_model');	
+	$this->load->model('Config_model');
+	$this->load->model('Audit_model');	
 }
 
 public function index(){
 		$this-> show_all_permissions_paginated(0, 0);
 	}
 
+/*************HAS PERMISSIONS*********************/
 private function has_permission_to_view(){
 	$all_permissions = $this->session->userdata('permissions');
 	$permission = array();
@@ -66,6 +81,7 @@ private function has_permission_to_add(){
     	}
 }
 
+/********************PAGINATION SETUP*********************************/
 private function pagination_setup(){		
 	$default_pagination= $this->Config_model->get_default_pagination();
 	$per_page = ($this->uri->segment(4))? $this->uri->segment(4) : $default_pagination;	
@@ -90,7 +106,8 @@ private function pagination_setup(){
 	$pagination_config["num_tag_close"] = "</li>";
 		$this->pagination->initialize($pagination_config);
 	return $pagination_config;	
-}	
+}
+/*********************SHOW ALL PERMISSIONS************************************/	
 public function show_all_permissions_paginated($pagination_config){
 	if ($this->session->userdata('is_logged_in') && $this->has_permission_to_view()){
 		$this->load->helper("url");
@@ -108,6 +125,8 @@ public function show_all_permissions_paginated($pagination_config){
 		$view_data['title']="Permissions";
 		$view_data['page_header']= "All Permissions";
 		$data= array_merge($view_data, $data);
+		$audit = array('primary' => 'PERM', 'secondary'=>'VIEW', 'status'=>true,  'controller'=>'Permission', 'value'=>null,  'extra_1' =>'show permissions paginated', 'extra_2'=>null, 'extra_3'=>null);
+		$this->Audit_model->log_entry($audit);
 		$this->load->view("header",$data);
 		$this->load->view("navbar",$data);
 		$this->load->view("show_all_permissions_view",$data);
@@ -116,6 +135,7 @@ public function show_all_permissions_paginated($pagination_config){
 		      redirect ('User/restricted');	
 			}
 	}
+	
 public function show_all_permissions(){
 	if ($this->session->userdata('is_logged_in') && $this->has_permission_to_view()){
 		$data["results"] = $this->Roles_permissions_model->get_all_permissions();
@@ -125,6 +145,8 @@ public function show_all_permissions(){
 		$view_data['allow_delete'] = $this->has_permission_to_delete();
 		$view_data['allow_edit'] = $this->has_permission_to_edit();
 		$data= array_merge($view_data, $data);
+		$audit = array('primary' => 'PERM', 'secondary'=>'VIEW', 'status'=>true,  'controller'=>'Permission', 'value'=>null,  'extra_1' =>'show all permissions', 'extra_2'=>null, 'extra_3'=>null);
+		$this->Audit_model->log_entry($audit);
 		$this->load->view("header",$data);
 		$this->load->view("navbar",$data);
 		$this->load->view("show_all_permissions_view",$data);
@@ -134,21 +156,29 @@ public function show_all_permissions(){
 			}
 	}
 
+/*********************ADD, DELETE & UPDATE A PERMISSION***********************************/
 public function delete($id){
 	if ($this->session->userdata('is_logged_in') && $this->has_permission_to_delete()){
 		if ($this->Roles_permissions_model->delete_permission($id)){
-			$pagination_config = $this->pagination_setup();
-			$this->show_all_permissions_paginated($pagination_config);			
+			$audit = array('primary' => 'PERM', 'secondary'=>'DELP', 'status'=>true,  'controller'=>'Permission', 'value'=>$id,  'extra_1' =>'deleted the permission', 'extra_2'=>null, 'extra_3'=>null);
+			$this->Audit_model->log_entry($audit);
+			$message = "<div class='alert alert-info'  role='alert'><p><span class='glyphicon glyphicon-exclamation-sign'></span> <strong>Deleted!</strong> The permission was deleted from the system.</p></div>";
+			$this->session->set_flashdata('message',$message);
+			redirect('Permissions');			
 			}else{
-			$error = "Unable to delete the permission. Either it doesn't exist or there is something wrong with the database.";
-			$this->error_message($error);
+			$audit = array('primary' => 'PERM', 'secondary'=>'DELP', 'status'=>false,  'controller'=>'Permission', 'value'=>null,  'extra_1' =>'failed to delete the permission', 'extra_2'=>null, 'extra_3'=>null);
+			$this->Audit_model->log_entry($audit);			
+			$message = "<div class='alert alert-danger' role='alert'><span class='glyphicon glyphicon-exclamation-sign'></span> <strong>Failure!</strong> Failed to delete permission.</div>";
+			$this->session->set_flashdata('message',$message);
+			redirect('Permissions');
 			}					
 		}else{
 		redirect ('User/restricted');	
 		}
 	} 	
-	
 public function postValue($id, $column){	//FOR INLINE EDITS
+  if($this->session->userdata('is_logged_in')){
+  	$audit_value = json_encode($this->input->post());			
 	$this->load->library('form_validation');
 	if($column=='permission'){
 		$this->form_validation->set_rules('value', 'Permission name', 'required|trim|min_length[4]|max_length[16]|is_unique[permissions.permission]');
@@ -162,18 +192,31 @@ public function postValue($id, $column){	//FOR INLINE EDITS
 		if($column=='status'){$data = array('status'=>$this->input->post('value'));}
 		if($column=='category'){$data = array('category'=>$this->input->post('value'));}
 		if ($this->Roles_permissions_model->update_permission($data, $id)){
+			$audit = array('primary' => 'PERM', 'secondary'=>'UPDT', 'status'=>true,  'controller'=>'Permission', 'value'=>$audit_value,  'extra_1'=>$column, 'extra_2'=>null, 'extra_3'=>null);
+			$this->Audit_model->log_entry($audit);		
 			http_response_code(200);
 		}else{
+			$audit = array('primary' => 'PERM', 'secondary'=>'UPDT', 'status'=>false,  'controller'=>'Permission', 'value'=>$audit_value,  'extra_1'=>$column, 'extra_2'=>'failed to update', 'extra_3'=>null);
+			$this->Audit_model->log_entry($audit);		
 			http_response_code(400);
 			echo "The database didn't update";
 		}}else{
+  	  $audit = array('primary' => 'PERM', 'secondary'=>'UPDT', 'status'=>false,  'controller'=>'Permission', 'value'=>$audit_value,  'extra_1'=>$column, 'extra_2'=>'forms validation error', 'extra_3'=>null);
+	  $this->Audit_model->log_entry($audit);		
 		http_response_code(400);
 		 echo strip_tags(validation_errors());
-	}
+	}}else{
+			$audit = array('primary' => 'PERM', 'secondary'=>'UPDT', 'status'=>false,  'controller'=>'Permission', 'value'=>$audit_value,  'extra_1'=>$column, 'extra_2'=>'session timeout error', 'extra_3'=>null);
+			$this->Audit_model->log_entry($audit);		
+			http_response_code(400);
+	   	echo "The session timed out";
+	   	}
 }
 
 public function add(){
 	if ($this->session->userdata('is_logged_in') && $this->has_permission_to_add()){
+	$audit = array('primary' => 'PERM', 'secondary'=>'ADDV', 'status'=>true,  'controller'=>'Permission', 'value'=>null,  'extra_1' =>null, 'extra_2'=>null, 'extra_3'=>null);
+	$this->Audit_model->log_entry($audit);		
 	$data['title']="Create a permission";
 	$data['page_header']="Create a permission";
 	$this->load->view("header",$data);
@@ -187,6 +230,7 @@ public function add(){
 
 public function add_validation(){
 	if ($this->session->userdata('is_logged_in') && $this->has_permission_to_add()){
+	$audit_value = json_encode($this->input->post());
 	$this->load->library('form_validation');
 	$this->form_validation->set_rules('permission', 'Permission Name', 'required|trim|min_length[4]|max_length[16]|is_unique[permissions.permission]');
 	$this->form_validation->set_rules('description', 'Description', 'required|max_length[100]|trim');
@@ -202,11 +246,21 @@ public function add_validation(){
 		'category'=>$this->input->post('category')
 		);
 		if($this->Roles_permissions_model->add_permission($data)){
-			$this->index();
-			}else{ 
-			echo "Failed to create the new permission.";
+			$audit = array('primary' => 'PERM', 'secondary'=>'ADD', 'status'=>true,  'controller'=>'Permission', 'value'=>$audit_value,  'extra_1' =>null, 'extra_2'=>null, 'extra_3'=>null);
+			$this->Audit_model->log_entry($audit);	
+			$message = "<div class='alert alert-success' role='alert'><span class='glyphicon glyphicon-ok'></span> <strong>Success!</strong> Permission successfully added.</div>";
+			$this->session->set_flashdata('message',$message);
+			redirect('Permissions');
+			}else{
+			$audit = array('primary' => 'PERM', 'secondary'=>'ADD', 'status'=>false,  'controller'=>'Permission', 'value'=>$audit_value,  'extra_1' =>'failed to add permission', 'extra_2'=>null, 'extra_3'=>null);
+			$this->Audit_model->log_entry($audit);	 
+			$message = "<div class='alert alert-danger' role='alert'><span class='glyphicon glyphicon-exclamation-sign'></span> <strong>Failure!</strong> Failed to add new permission.</div>";
+			$this->session->set_flashdata('message',$message);
+			redirect('Permissions');
 			}	
 	}else{
+	$audit = array('primary' => 'PERM', 'secondary'=>'ADD', 'status'=>false,  'controller'=>'Permission', 'value'=>$audit_value,  'extra_1' =>'form validation error', 'extra_2'=>null, 'extra_3'=>null);
+	$this->Audit_model->log_entry($audit);	 
 	$this->add();
 	}}else{
 		redirect ('User/restricted');	
@@ -215,6 +269,8 @@ public function add_validation(){
 	
 public function update($id){
 	if ($this->session->userdata('is_logged_in') && $this->has_permission_to_edit()){
+	$audit = array('primary' => 'PERM', 'secondary'=>'UPDV', 'status'=>true,  'controller'=>'Permission', 'value'=>$id,  'extra_1' =>null, 'extra_2'=>null, 'extra_3'=>null);
+	$this->Audit_model->log_entry($audit);	
 	$data['results']= $this->Roles_permissions_model->get_permission($id);
 	$data['title']="Edit the permission";
 	$data['page_header']="Edit the permission";
@@ -229,6 +285,7 @@ public function update($id){
 
 public function update_validation(){
 	if ($this->session->userdata('is_logged_in') && $this->has_permission_to_edit()){
+	$audit_value = json_encode($this->input->post());
 	$id = $this->input->post('id');
 	$this->load->library('form_validation');
 	$this->form_validation->set_rules('description', 'Description', 'required|max_length[100]|trim');
@@ -242,11 +299,21 @@ public function update_validation(){
 		'category'=>$this->input->post('category')
 		);
 		if($this->Roles_permissions_model->update_permission($data, $id)){
-			$this->index();
+			$audit = array('primary' => 'PERM', 'secondary'=>'UPDT', 'status'=>true,  'controller'=>'Permission', 'value'=>$audit_value,  'extra_1' =>null, 'extra_2'=>null, 'extra_3'=>null);
+			$this->Audit_model->log_entry($audit);	
+			$message = "<div class='alert alert-success' role='alert'><span class='glyphicon glyphicon-ok'></span> <strong>Success!</strong> Permission successfully updated.</div>";
+			$this->session->set_flashdata('message',$message);
+			redirect('Permissions');
 			}else{ 
-			echo "Failed to update the new permission.";
+			$audit = array('primary' => 'PERM', 'secondary'=>'UPDT', 'status'=>false,  'controller'=>'Permission', 'value'=>$audit_value,  'extra_1' =>'failed to update permission', 'extra_2'=>null, 'extra_3'=>null);
+			$this->Audit_model->log_entry($audit);	 
+			$message = "<div class='alert alert-danger' role='alert'><span class='glyphicon glyphicon-exclamation-sign'></span> <strong>Failure!</strong> Failed to update permission.</div>";
+			$this->session->set_flashdata('message',$message);
+			redirect('Permissions');
 			}	
 	}else{
+   $audit = array('primary' => 'PERM', 'secondary'=>'UPDT', 'status'=>false,  'controller'=>'Permission', 'value'=>$audit_value,  'extra_1' =>'form validation error', 'extra_2'=>null, 'extra_3'=>null);
+	$this->Audit_model->log_entry($audit);	 
 	$this->update($id);
 	}}else{
 		redirect ('User/restricted');	

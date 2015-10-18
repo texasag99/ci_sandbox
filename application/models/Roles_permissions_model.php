@@ -69,7 +69,8 @@ class Roles_permissions_model extends CI_Model {
 	public function delete_role($id){
 		$this->db->where('id',$id);
 		if($this->db->delete('roles')){
-		    return true;
+			$this->unlink_all_permissions_to_role($id);
+		   return true;
 		}else{
 			return false;
 		}

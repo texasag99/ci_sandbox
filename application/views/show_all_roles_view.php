@@ -1,3 +1,13 @@
+<script>
+$(document).ready(function() {
+	if ($(window).width() < 640) {
+		$(".role_created_column").remove();
+		$(".role_updated_column").remove();
+		$(".role_description_column").remove();	
+		}
+
+	});
+</script>
 <div id="container" class="container-fluid">
 <div id="body">
 <h1><?php echo $page_header; ?></h1>

@@ -76,8 +76,7 @@ echo form_input(array('name'=>'created','value'=>$created,
 echo "<label for='profile_updated'>Last Updated:</label> ";
 echo form_input(array('name'=>'profiled_updated','value'=>$profile_updated,
      'readonly'=>'readonly')); 
-
-
+     
 echo '<br><button type="submit" class="btn btn-primary">Update</button>';
 
 		 

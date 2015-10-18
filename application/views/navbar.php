@@ -6,7 +6,8 @@ $view_permission = array(
 		'view_roles'=>FALSE,
 		'view_permissions'=>FALSE,
 		'view_config'=>FALSE,
-		'view_admin'=>FALSE
+		'view_admin'=>FALSE,
+		'view_audit'=>FALSE
 
 );
 if($this->session->userdata('permissions')) {
@@ -18,8 +19,9 @@ $permission = array();
 	if(in_array(9005, $permission) ||in_array(9999, $permission)){$view_permission['view_useradmin'] = TRUE;}
   if(in_array(9030, $permission) ||in_array(9999, $permission)){$view_permission['view_roles'] = TRUE;}
   if(in_array(9050, $permission) ||in_array(9999, $permission)){$view_permission['view_permissions'] = TRUE;}
-  if(in_array(9065, $permission) ||in_array(9999, $permission)){$view_permission['view_config'] = TRUE;} 
-  if($view_permission['view_useradmin'] ||$view_permission['view_roles'] ||$view_permission['view_permissions']||$view_permission['view_config']){
+  if(in_array(9065, $permission) ||in_array(9999, $permission)){$view_permission['view_config'] = TRUE;}
+   if(in_array(9080, $permission) ||in_array(9999, $permission)){$view_permission['view_audit'] = TRUE;}
+  if($view_permission['view_useradmin'] ||$view_permission['view_roles'] ||$view_permission['view_permissions']||$view_permission['view_config']||$view_permission['view_audit']){
 		$view_permission['view_admin'] = TRUE;	}
 }
 
@@ -40,13 +42,14 @@ $permission = array();
     <?php if ($this->session->userdata('is_logged_in')){ ?> 
 	  <ul class ="nav navbar-nav nav-default">
 	  <?php if ($view_permission['view_admin']){ ?>
-		  <li class="dropdown"><a class"dropdown-toggle" data-toggle="dropdown" href="#">Admin<span class="caret"></span></a>
+		  <li class="dropdown"><a class="dropdown-toggle" data-toggle="dropdown" href="#">Admin<span class="caret"></span></a>
 			  <ul class="dropdown-menu" role="menu">
 			  <?php
 			  if($view_permission['view_useradmin']){ echo "<li><a href='".base_url()."UserAdmin'>Users</a></li>";}
 			  if($view_permission['view_roles']){ echo "<li><a href='".base_url()."Roles'>Roles</a></li>";}
 			  if($view_permission['view_permissions']){ echo "<li><a href='".base_url()."Permissions'>Permissions</a></li>";}
 			  if($view_permission['view_config']){ echo "<li><a href='".base_url()."Config'>Settings</a></li>";}
+			  if($view_permission['view_audit']){ echo "<li><a href='".base_url()."Audit'>Audit</a></li>";}
 			  ?>			  
 			  </ul>
 		  </li>

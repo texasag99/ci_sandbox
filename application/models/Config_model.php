@@ -17,6 +17,8 @@ public function get_all_settings(){
 				 		$data['from_name']= $row->from_name;
 				 		$data['retry_limit']= $row->retry_limit;
 				 		$data['default_pagination']= $row->default_pagination;
+				 		$data['reset_pwd_days']= $row->reset_pwd_days;
+				 		$data['allow_registration']= $row->allow_registration;
 				 		}
 			return $data;
 		}
@@ -90,4 +92,48 @@ public function set_default_pagination($default_pagination)	{
 		return false;
 		}
    }
+
+
+public function get_reset_pwd_days(){
+		$query = $this->db->get('config');
+	    foreach($query->result() as $row){
+ 		 $reset_pwd_days= $row->reset_pwd_days;
+		 }
+		 return  $reset_pwd_days;
+		 }
+	
+public function set_reset_pwd_days($reset_pwd_days)	{
+		$data = array(
+			'reset_pwd_days'=>$reset_pwd_days
+		);
+		if($this->db->update('config',$data)){
+		return true;
+		}else{
+		return false;
+		}
+   }
+   
+ public function get_allow_registration(){
+		$query = $this->db->get('config');
+	    foreach($query->result() as $row){
+	    $allow_registration= $row->allow_registration;
+		 }
+		 return  $allow_registration;
+		 }
+	
+public function set_allow_registration($allow_registration)	{
+		$data = array(
+			'allow_registration'=>$allow_registration
+		);
+		if($this->db->update('config',$data)){
+		return true;
+		}else{
+		return false;
+		}
+   }     
+   
+   
+   
+   
+   
 }

@@ -3,6 +3,7 @@
 
 $(document).ready(function(){	
 	$('#header').fadeTo(4000,0.25); //FADES THE HEADER
+   $('#message').delay(10000).slideUp('slow');
    $('input').addClass('form-control'); //ADD CLASS TO FORM INPUTS
 	$('select').addClass('form-control'); //ADD CLASS TO FORM DROPDOWNS
    $('.multi-select').multiselect({

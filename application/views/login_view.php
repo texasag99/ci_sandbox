@@ -3,7 +3,9 @@
 
 <div id="body">
 <div id="login_container">
+<?php if($allow_registration){?>
 <a href='<?php echo base_url()."User/registration"; ?>' class="btn btn-default">Register</a> &nbsp;&nbsp;
+<?php } ?>
 <a href='<?php echo base_url()."User/forgot_my_password"; ?>' class="btn btn-default">Forgot My Password</a>
 <h3>Please enter your email and password!</h3>
 <div class="form-group">

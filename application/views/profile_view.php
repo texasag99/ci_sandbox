@@ -39,6 +39,7 @@ if(ISSET($_SERVER['HTTP_REFERER'])){
 <tr><td class='text-right'>Alternate Email:</td><td>&nbsp;<?php echo $email2; ?><td></tr>
 <tr><td class='text-right'>Created On:</td><td>&nbsp;<?php echo $created; ?><td></tr>
 <tr><td class='text-right'>Last Updated:</td><td>&nbsp;<?php echo $profile_updated; ?><td></tr>
+<tr><td class='text-right'>Last Activity:</td><td>&nbsp;<?php echo $last_activity; ?><td></tr>
 </tbody>
 </table>
 <p></p>

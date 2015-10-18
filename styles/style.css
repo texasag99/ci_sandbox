@@ -220,8 +220,22 @@ padding-left:30px;
 margin-left:40%;
 background-color:lightgray;
 	}
-	
-.bootbox_dialog{
+
+#message{
+	text-align:center;
 	}
+
+.submenu{
+		float:left;
+		width:70%;	
+	}
+	
+.search_by{
+		float:right;
+		width:30%;
+		
+		
+		
+		}
 
 

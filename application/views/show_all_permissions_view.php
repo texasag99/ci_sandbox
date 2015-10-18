@@ -1,8 +1,20 @@
+<script>
+$(document).ready(function() {
+	if ($(window).width() < 640) {
+		$(".permission_created_column").remove();
+		$(".permission_updated_column").remove();
+		$(".permission_description_column").remove();	
+		}
+	if ($(window).width() < 430) {
+		$(".permission_category_column").remove();
+		}
+	});
+</script>
 <div id="container" class="container-fluid">
 <div id="body">
 <h1><?php echo $page_header; ?></h1>
 <?php if($allow_add){
-	echo"<a href='<?php echo base_url().\"Permissions/add\"; ?>' class=\"btn btn-default\">Create permission</a> &nbsp;&nbsp;";
+	echo"<a href='".base_url()."/Permissions/add' class='btn btn-default'>Create permission</a> &nbsp;&nbsp;";
 }?>
 <?php   
 if(isset($message) && !empty($message)){
@@ -17,7 +29,7 @@ echo "<p>$message</p>";
 		<th class='permission_column'>Permission</th>
 		<th class='permission_description_column'>Description</th>
 		<th class='permission_status_column'>Status</th>
-		<th class='permission_column'>Category</th>
+		<th class='permission_category_column'>Category</th>
 		<th class='permission_created_column'>Created On</th>
 		<th class='permission_updated_column'>Last Updated</th>	
 <?php if($allow_edit || $allow_delete){ echo "<th class='edit_button_column'></th>"; } ?>	

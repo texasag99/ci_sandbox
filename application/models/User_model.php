@@ -12,6 +12,18 @@ public function user_record_count() {
 		return $this->db->count_all("user");
 	}
 	
+public function active_user_record_count(){
+	$this->db->where('status','ACTIVE');
+	return $this->db->count_all_results("user");			
+	}
+	
+public function search_user_record_count($search_by){
+	$this->db->or_like('first', $search_by);
+   $this->db->or_like('last', $search_by );
+   $this->db->or_like('email', $search_by );
+	return $this->db->count_all_results("user");			
+	}
+	
 public function sort_by($sort_by){
 		switch($sort_by){
 					case 1: return $this->db->order_by("last","asc");
@@ -26,6 +38,8 @@ public function sort_by($sort_by){
 					case 10: return $this->db->order_by("created","desc");
 					case 11: return $this->db->order_by("last_updated","asc");
 					case 12: return $this->db->order_by("last_updated","desc");
+					case 13: return $this->db->order_by("last_activity","asc");
+					case 14: return $this->db->order_by("last_activity","desc");
 					default : return NULL;			
 			}		
 		}
@@ -67,6 +81,23 @@ public function get_all_active_users_paginated($limit, $start, $sort_by){
 		}
 		return false;	
 	}
+	
+public function  search_users_paginated($limit, $start, $sort_by, $search_by){
+		$this->sort_by($sort_by);		
+		$this->db->limit($limit,$start);
+		$search_by = trim($search_by);
+      $this->db->or_like('first', $search_by);
+      $this->db->or_like('last', $search_by );
+      $this->db->or_like('email', $search_by );
+      $query = $this->db->get("user");
+		if ($query->num_rows() > 0) {
+				foreach($query->result() as $row){
+					$data[] = $row;
+			}
+			return $data;
+		}
+		return false;	
+	}	
 
 public function delete_user($id){
 		$this->db->where('id',$id);
@@ -86,7 +117,7 @@ public function can_log_in(){
 			}else{
 			return false;
 			}		
-}	//Verifies the user can login	
+}	//Verifies the user is allowed to login	
 
 public function is_active(){
 		$this->db->where('email', $this->input->post('email'));
@@ -119,6 +150,19 @@ public function verify_email($email){
 			return false;
 			}		
 	} //Verifies the user account exists
+
+public function update_last_activity(){
+	$user_data = array (
+	'last_activity'=>date("Y-m-d H:i:s")
+	);
+	$this->db->where('email', $this->input->post('email'));
+	$this->db->update('user',$user_data);
+	if($this->db->affected_rows() >0){
+					return true;
+				}else{
+					return false;
+				}
+}
 	
 public function verify_password($password, $email){
 		$this->db->where('email', $email);
@@ -188,6 +232,7 @@ public function get_retry_limit() {
 public function update_password($password, $email){
 $user_data = array (
 		'password' => $password,
+		'pwd_last_updated' =>date("Y-m-d H:i:s"),
 		'last_updated'=>date("Y-m-d H:i:s")
 );
 $this->db->where('email',$email);
@@ -204,6 +249,7 @@ public function register_new_user($data){
 								'last'=>$this->input->post('last'),
 								'email'=>$this->input->post('email'),
 								'password'=>md5($this->input->post('password')),
+								'pwd_last_updated'=>date("Y-m-d H:i:s"),
 								'created'=>date("Y-m-d H:i:s"),
 								'last_updated'=>date("Y-m-d H:i:s"),
 								'status' => 'PENDING',
@@ -222,6 +268,7 @@ public function create_new_user($user_data){
 	  $add_data = array(
 							  'created'=>date("Y-m-d H:i:s"),
 								'last_updated'=>date("Y-m-d H:i:s"),
+								'last_activity'=>date("Y-m-d H:i:s"),
 								'locked' => 0	  
 	  );	
 	  $data =array_merge($user_data, $add_data);
@@ -258,6 +305,7 @@ public function activate_new_user($key){
 	}
    $user_data = array(
 								'last_updated'=>date("Y-m-d H:i:s"),
+								'last_activity'=>date("Y-m-d H:i:s"),
 								'status' => 'ACTIVE'
 								);				
 	$this->db->where('email', $email);
@@ -282,6 +330,8 @@ public function get_user_data($email){
  		$user_data['last']= $row->last;
  		$user_data['created']= $row->created;
  		$user_data['last_updated']= $row->last_updated; 
+ 		$user_data['last_activity']= $row->last_activity;
+ 		$user_data['pwd_last_updated']= $row->pwd_last_updated;
  		$user_data['id']= $row->id;
  }
  $id = $user_data['id'];
@@ -297,7 +347,9 @@ public function get_user_data($email){
  		$user_data['first']= $row->first;
  		$user_data['last']= $row->last;
  		$user_data['created']= $row->created;
- 		$user_data['last_updated']= $row->last_updated; 
+ 		$user_data['last_updated']= $row->last_updated;
+ 		$user_data['last_activity']= $row->last_activity; 
+ 		$user_data['pwd_last_updated']= $row->pwd_last_updated;
  		$user_data['status']= $row->status;
  		$user_data['id']= $row->id;
  }

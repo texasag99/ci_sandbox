@@ -40,6 +40,19 @@ $(function(){
    <?php  }} ?>
 </head>
 <body>
+<div id='message'>
+<?php
+$this->benchmark->mark('code_end');
+echo "<div class='elapsed'>".$this->benchmark->elapsed_time('code_start','code_end')." seconds elapsed.</div>";		
+?>
+
+<?php
+$message = $this->session->flashdata('message');
+if(isset($message) && !empty($message)){
+echo $message;	
+	}
+?>
+</div>
 <div id="header">
 <p id="title"><?php echo APPLICATION_TITLE; ?> <span class="version_number">Version <?php  echo APPLICATION_VERSION; ?></span></p>
 </div>
