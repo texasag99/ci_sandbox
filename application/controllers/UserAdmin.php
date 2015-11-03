@@ -16,12 +16,15 @@ public function __construct(){
 	$this->load->model('Roles_permissions_model');
 	$this->load->library('pagination');
 	$this->load->model('Config_model');
-	$this->load->model('Audit_model');	
+	$this->load->model('Audit_model');
+	
 }
 
 public function index(){
 		$this-> show_all_active_users_paginated(0, 0, 0);
 	}
+
+
 
 /*************HAS PERMISSIONS*********************/
 private function has_permission_to_view(){
@@ -133,8 +136,9 @@ public function show_all_users_paginated($sort_by, $pagination_config){
 		$data["results"] = $this->User_model->get_all_users_paginated($pagination_config["per_page"], $start, $sort_by);
 		$data ["links"] = $this->pagination->create_links();
 		$default_pagination= $this->Config_model->get_default_pagination();
-	  $view_data['per_page'] = ($this->uri->segment(5))? $this->uri->segment(5) : $default_pagination;	
-	  $view_data['sort_by'] = $this->uri->segment(3); 
+	   $view_data['per_page'] = ($this->uri->segment(5))? $this->uri->segment(5) : $default_pagination;	
+	   $view_data['total_records'] = $pagination_config['total_rows'];
+	   $view_data['sort_by'] = $this->uri->segment(3); 
 		$view_data['title']="Users";
 		$view_data['controller']="show_all_users_paginated";
 		$view_data['allow_add'] = $this->has_permission_to_add();
@@ -142,17 +146,28 @@ public function show_all_users_paginated($sort_by, $pagination_config){
 		$view_data['allow_edit'] = $this->has_permission_to_edit();
 		$view_data['page_header']= "All Users";
 		$data= array_merge($view_data, $data);
+		if ($pagination_config == 999999){
+		$audit = array('primary' => 'USRA', 'secondary'=>'PDF', 'status'=>true,  'controller'=>'UserAdmin', 'value'=>null,  'extra_1' =>'all users paginated', 'extra_2'=>null, 'extra_3'=>null);
+		$this->Audit_model->log_entry($audit);
+		$this->load->library('Pdf');
+		$this->pdf->load_view('pdf_user_view',$data);
+		$this->pdf->render();
+		$this->pdf->stream("User_report.pdf");
+		}else{
 		$audit = array('primary' => 'USRA', 'secondary'=>'VIEW', 'status'=>true,  'controller'=>'UserAdmin', 'value'=>null,  'extra_1' =>'all users paginated', 'extra_2'=>null, 'extra_3'=>null);
 		$this->Audit_model->log_entry($audit);
 		$this->load->view("header",$data);
 		$this->load->view("navbar",$data);
 		$this->load->view("show_users_view",$data);
 		$this->load->view("footer",$data);
-		$this->benchmark->mark('code_end');		
-			}else{
+		$this->benchmark->mark('code_end');	
+		}			
+	}else{
 		      redirect ('User/restricted');	
 			}
 	} 
+	
+	
 public function show_all_active_users_paginated($sort_by, $pagination_config){
 	if ($this->session->userdata('is_logged_in') && $this->has_permission_to_view()){
 		$this->load->helper("url");
@@ -163,7 +178,8 @@ public function show_all_active_users_paginated($sort_by, $pagination_config){
 		$data["results"] = $this->User_model->get_all_active_users_paginated($pagination_config["per_page"], $start, $sort_by);
 		$data ["links"] = $this->pagination->create_links();
 		$default_pagination= $this->Config_model->get_default_pagination();
-	   $view_data['per_page'] = ($this->uri->segment(5))? $this->uri->segment(5) : $default_pagination;	
+	   $view_data['per_page'] = ($this->uri->segment(5))? $this->uri->segment(5) : $default_pagination;
+	   $view_data['total_records'] = $pagination_config['total_rows'];	
 	   $view_data['sort_by'] = $this->uri->segment(3); 
 		$view_data['title']="Users";
 		$view_data['controller']="show_all_active_users_paginated";
@@ -172,14 +188,22 @@ public function show_all_active_users_paginated($sort_by, $pagination_config){
 		$view_data['allow_edit'] = $this->has_permission_to_edit();
 		$view_data['page_header']= "All Users";
 		$data= array_merge($view_data, $data);
+		if ($pagination_config == 999999){
+		$audit = array('primary' => 'USRA', 'secondary'=>'PDF', 'status'=>true,  'controller'=>'UserAdmin', 'value'=>null,  'extra_1' =>'all users paginated', 'extra_2'=>null, 'extra_3'=>null);
+		$this->Audit_model->log_entry($audit);
+		$this->load->library('Pdf');
+		$this->pdf->load_view('pdf_user_view',$data);
+		$this->pdf->render();
+		$this->pdf->stream("User_report.pdf");
+		}else{
 		$audit = array('primary' => 'USRA', 'secondary'=>'VIEW', 'status'=>true,  'controller'=>'UserAdmin', 'value'=>null,  'extra_1' =>'all active users paginated', 'extra_2'=>null, 'extra_3'=>null);
 		$this->Audit_model->log_entry($audit);
 		$this->load->view("header",$data);
 		$this->load->view("navbar",$data);
 		$this->load->view("show_users_view",$data);
 		$this->load->view("footer",$data);
-					
-			}else{
+		}			
+	}else{
 		      redirect ('User/restricted');	
 			}
 	}
@@ -221,6 +245,7 @@ public function search_users_paginated($search_by,$sort_by, $pagination_config){
 		$data['search_by']=$search_by;
 		$default_pagination= $this->Config_model->get_default_pagination();
 	   $view_data['per_page'] = ($this->uri->segment(6))? $this->uri->segment(6) : $default_pagination;	
+	   $view_data['total_records'] = $pagination_config['total_rows'];
 	   $view_data['sort_by'] = $this->uri->segment(4); 
 		$view_data['title']="Users";
 		$view_data['allow_add'] = $this->has_permission_to_add();
@@ -229,17 +254,48 @@ public function search_users_paginated($search_by,$sort_by, $pagination_config){
 		$view_data['page_header']= "All Users";
 		$view_data['controller']="search_users_paginated/".$search_by;
 		$data= array_merge($view_data, $data);
+		if ($pagination_config == 999999){//Print it as a PDF
+		$audit = array('primary' => 'USRA', 'secondary'=>'PDF', 'status'=>true,  'controller'=>'UserAdmin', 'value'=>null,  'extra_1' =>'all users paginated', 'extra_2'=>null, 'extra_3'=>null);
+		$this->Audit_model->log_entry($audit);
+		$this->load->library('Pdf');
+		$this->pdf->load_view('pdf_user_view',$data);
+		$this->pdf->render();
+		$this->pdf->stream("User_report.pdf");
+		}else{
 		$audit = array('primary' => 'USRA', 'secondary'=>'SRCH', 'status'=>true,  'controller'=>'UserAdmin', 'value'=>$search_by,  'extra_1' =>'search users paginated', 'extra_2'=>null, 'extra_3'=>null);
 		$this->Audit_model->log_entry($audit);
 		$this->load->view("header",$data);
 		$this->load->view("navbar",$data);
 		$this->load->view("show_users_view",$data);
 		$this->load->view("footer",$data);
-		$this->benchmark->mark('code_end');		
-			}else{
+		$this->benchmark->mark('code_end');	
+	}	
+	}else{
 		      redirect ('User/restricted');	
 			}
 	} 	
+	
+public function build_pdf_html($results){
+	$html = "<div class ='body'><h1>Users</h1><p>This report was created on <strong>".date("Y-m-d H:i:s")."</strong></p>";
+	$html .= "<table><thead><td class='user_column'>Name</td><td class='user_email_column'>Email</td><td class='user_status_column'>Status</td><td class='user_locked_column'>Locked</td>";
+	$html .="<td class='user_created_column'>Created On</td><td class='user_updated_column'>Last Updated</td><td class='user_updated_column'>Last Activity</td></thead><tbody>";
+  foreach ($results as $data){
+	if ($data->locked == 0){
+		   $locked = "No";
+		}else{
+			$locked = "Yes";
+			}
+		$html .= "<tr><td class='user_column'> ".$data->first." ".$data->last." </td>";
+		$html .= "<td class='user_email_column'> ".$data->email." </td>";
+		$html .= "<td class='user_status_column'> ".$data->status." </td>";
+		$html .= "<td class='user_locked_column'> ".$locked." </td>";
+		$html .= "<td class='user_created_column'> ".date('m-d-Y', strtotime($data->created))." </td>";
+		$html .= "<td class='user_updated_column'> ".date('m-d-Y', strtotime($data->last_updated))." </td>";
+		$html .= "<td class='user_updated_column'> ".date('m-d-Y', strtotime($data->last_activity))." </td></tr>";
+}	
+	$html .= "</tbody></table></div>";
+	return $html;
+}
 	
 		
 /********AJAX retrieve of the profile data for each user to view in the show all.***************************/
@@ -551,5 +607,7 @@ private function need_to_validate_email($id){	 //TO UPDATE  A USER RECORD, SO YO
    	return true;
    }
    }
+   
+
  
 }

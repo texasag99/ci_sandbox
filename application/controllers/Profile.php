@@ -44,10 +44,14 @@ public function view_profile(){
 					$data= array_merge($view_data, $user_data, $profile_data);
 					$audit = array('primary' => 'PROF', 'secondary'=>'VIEW', 'status'=>true,  'controller'=>'Profile', 'value'=>$id,  'extra_1' =>null, 'extra_2'=>null, 'extra_3'=>null);
 	 	         $this->Audit_model->log_entry($audit);
+	 	         /*$this->load->library('Pdf');
+					$this->pdf->load_view('profile_view',$data);
+					$this->pdf->render();
+					$this->pdf->stream("profile.pdf");*/	 	         
 					$this->load->view("header",$data);
 					$this->load->view("navbar",$data);
 					$this->load->view('profile_view',$data);
-					$this->load->view("footer",$data);	
+					$this->load->view("footer",$data);
 			}else{
 		      redirect ('User/restricted');	
 			}

@@ -15,19 +15,22 @@ $(document).ready(function() {
 
 <div id="container" class="container-fluid">
 <div id="body">
-<h1><?php echo $page_header; ?></h1>
+<h1><?php echo $page_header; ?> <sup> <span title="Total Record Count" class="label label-info"><?php echo $total_records ?></span></sup></h1>
 <div class='submenu' style='width:70%; float:left;'>
 <?php if($allow_edit){
 	echo "<a href='".base_url()."Audit/truncate_log' class='btn btn-default'>Clear Audit Log</a> &nbsp;&nbsp;";
 }
 if($controller=="show_audit_paginated"){
-echo "<a href='".base_url()."Audit/show_failed_log_paginated/0/0/".$per_page."/0' class='btn btn-primary'>Show Failed Log</a>";
+echo "<a href='".base_url()."Audit/show_failed_log_paginated/0/0/".$per_page."/0' class='btn btn-primary'><span title='Hide Success' class='glyphicon glyphicon-eye-open'></span></a>";
+echo "&nbsp;<a href='".base_url()."Audit/".$controller."/".$sort_by."/999999/".$per_page."/0' class='btn btn-primary'><span title='Export to PDF'  class='glyphicon glyphicon-print'></span></a>";
 }elseif($controller=="show_failed_log_paginated"){
-echo "<a href='".base_url()."Audit/show_audit_paginated/0/0/".$per_page."/0' class='btn btn-warning'>Show All</a>";
+echo "<a href='".base_url()."Audit/show_audit_paginated/0/0/".$per_page."/0' class='btn btn-warning'><span title='Show All' class='glyphicon glyphicon-eye-close'></span></a>";
+echo "&nbsp;<a href='".base_url()."Audit/".$controller."/".$sort_by."/999999/".$per_page."/0' class='btn btn-primary'><span title='Export to PDF'  class='glyphicon glyphicon-print'></span></a>";
 }else{ 
-echo "<a href='".base_url()."Audit/show_audit_paginated/0/0/".$per_page."/0' class='btn btn-warning'>Show All</a>"; 
+echo "<a href='".base_url()."Audit/show_audit_paginated/0/0/".$per_page."/0' class='btn btn-warning'><span title='Show All' class='glyphicon glyphicon-eye-close'></span></a>"; 
+echo "&nbsp;<a href='".base_url()."Audit/".$controller."/".$sort_by."/999999/".$per_page."/0' class='btn btn-primary'><span title='Export to PDF'  class='glyphicon glyphicon-print'></span></a>";
 }
-echo"</div> <!--submenu-->";
+echo" </div> <!--submenu-->";
 
 echo "<div class='search_by form-group' style='width:30%; float:right;'>";
 echo form_open('Audit/search_audit');
@@ -151,12 +154,10 @@ echo "<p>$message</p>";
 </thead>
 <tbody class="table-hover">
 	<?php
-	$counter = 0;	
 	if(isset($results) && !empty($results)){
-	foreach ($results as $data){
-	$counter++;
+	foreach ($results as $data){	
 		if ($data->status == 0){
-		   $status = "Fail";
+		   $status = "Failure";
 		}else{
 			$status= "Success";
 			}
@@ -197,7 +198,7 @@ echo "<p>$message</p>";
 				             							}            						
 				             						});
 				             						 
-								$('#audit').load('".base_url()."Audit/getAudit/".$data->id."  #audit_info');								
+								$('#audit').load('".base_url()."Audit/getAudit/".$data->id."  #audit_record');								
 							});
 						});			
 				</script>";

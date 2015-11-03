@@ -22,6 +22,7 @@ public function search_log_record_count($search_by){
 	$this->db->or_like('primary', $search_by);
    $this->db->or_like('secondary', $search_by );
    $this->db->or_like('user_email', $search_by );
+   $this->db->or_where('ip_address', $search_by);
 	return $this->db->count_all_results("audit");			
 	}
 	
@@ -79,8 +80,32 @@ public function log_entry($data){
 	         }
 }
 
-public function search_log(){
-
+public function get_audit_record($id){
+     $this->db->where('id',$id);
+ 	  $query = $this->db->get('audit');
+ if($query->num_rows() > 0){
+ 		 foreach($query->result() as $row){
+       $audit_data['id'] = $row->id;
+       $audit_data['datetime'] = $row->datetime;
+       $audit_data['primary'] = $row->primary;
+       $audit_data['secondary'] = $row->secondary;
+       $audit_data['session_id'] = $row->session_id;
+       $audit_data['user_email'] = $row->user_email;
+       $audit_data['status'] = $row->status;
+       $audit_data['uri'] = $row->uri;
+       $audit_data['controller'] = $row->controller;
+       $audit_data['value'] = $row->value;
+		 $audit_data['ip_address'] = $row->ip_address;
+		 $audit_data['http_agent'] = $row->http_agent; 	
+	    $audit_data['http_host_data'] = $row->http_host_data;
+		 $audit_data['environmentals'] = $row->environmentals;
+		 $audit_data['extra_1'] = $row->extra_1; 	
+	    $audit_data['extra_2'] = $row->extra_2; 	
+	    $audit_data['extra_3'] = $row->extra_3;
+ 	}}else{
+  		 return false;
+ }
+return $audit_data;		
 }
 
 public function get_audit_paginated($limit, $start, $sort_by){
@@ -116,7 +141,8 @@ public function  search_audit_paginated($limit, $start, $sort_by, $search_by){
 		$search_by = trim($search_by);
       $this->db->or_like('primary', $search_by);
       $this->db->or_like('secondary', $search_by );
-      $this->db->or_like('user_email', $search_by );
+      $this->db->or_like('user_email', $search_by );      
+   	$this->db->or_where('ip_address', $search_by);
       $query = $this->db->get("audit");
 		if ($query->num_rows() > 0) {
 				foreach($query->result() as $row){
@@ -126,6 +152,24 @@ public function  search_audit_paginated($limit, $start, $sort_by, $search_by){
 		}
 		return false;	
 	}
+	
+public function export_log(){
+	$this->load->helper('file');
+	$this->db->order_by("datetime","desc");	
+	$query = $this->db->get('audit');
+	$datestamp= date("Y-m-d-H:i:s");	
+	$audit_file = "Audit file created on : ".$datestamp."\n\n";
+	foreach($query->result() as $row){
+ 		$audit_file .= $row->datetime."| ".$row->id."|".$row->primary."|".$row->secondary."|".$row->user_email."|".$row->ip_address."|".$row->status."|".$row->session_id."|".$row->uri." |";
+ 		$audit_file .= $row->value."|".$row->controller."|".$row->http_agent."|".$row->http_host_data."|".$row->environmentals."|".$row->extra_1."|".$row->extra_2."|".$row->extra_3."\n"; 
+ 	    }	
+ 	if(write_file('/var/www/CodeIgniter/application/logs/audit-'.$datestamp.'.csv', $audit_file)){ 
+ 	 $filename = "audit-".$datestamp.'.csv';
+ 	 return $filename;
+ 	 }else{
+	return false; 	 
+ 	 }
+ }
 
 public function truncate_log(){
 	$this->load->helper('file');
@@ -134,10 +178,10 @@ public function truncate_log(){
 	$datestamp= date("Y-m-d-H:i:s");	
 	$audit_file = "Audit file created on : ".$datestamp."\n\n";
 	foreach($query->result() as $row){
- 		$audit_file .= $row->datetime."| ".$row->id."| ".$row->primary."| ".$row->secondary."| ".$row->user_email."| ".$row->ip_address."| ".$row->status."| ".$row->session_id."| ".$row->uri."\n"
+ 		$audit_file .= $row->datetime."| ".$row->id."| ".$row->primary."| ".$row->secondary."| ".$row->user_email."| ".$row->ip_address."| ".$row->status."| ".$row->session_id."| ".$row->uri."\n";
  		$audit_file .= "            ".$row->value."| ".$row->controller."| ".$row->http_agent."| ".$row->http_host_data."| ".$row->environmentals."| ".$row->extra_1."| ".$row->extra_2."| ".$row->extra_3."\n"; 
  	    }	
-	if(write_file('/var/www/CodeIgniter/application/logs/audit-'.$datestamp.'.log', $audit_file)){
+ 	if(write_file('/var/www/CodeIgniter/application/logs/audit-'.$datestamp.'.csv', $audit_file)){ 
 	if($this->db->empty_table('audit')){
 		return true;
 	}else{

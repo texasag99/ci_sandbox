@@ -13,17 +13,20 @@ $(document).ready(function() {
 
 <div id="container" class="container-fluid">
 <div id="body">
-<h1><?php echo $page_header; ?></h1>
+<h1><?php echo $page_header; ?> <sup> <span title="Total Record Count" class="label label-info"><?php echo $total_records ?></span></sup></h1>
 <div class='submenu' style='width:70%; float:left;'>
 <?php if($allow_add){
 	echo "<a href='".base_url()."UserAdmin/add' class='btn btn-default'>Add User</a> &nbsp;&nbsp;";
 }
 if($controller=="show_all_active_users_paginated"){
-echo "<a href='".base_url()."UserAdmin/show_all_users_paginated/0/0/".$per_page."/0' class='btn btn-primary'>Show Inactive</a>";
+echo "<a href='".base_url()."UserAdmin/show_all_users_paginated/0/0/".$per_page."/0' class='btn btn-primary'><span title='Show All' class='glyphicon glyphicon-eye-close'></span></a> ";
+echo "<a href='".base_url()."UserAdmin/".$controller."/".$sort_by."/999999/0/0' class='btn btn-primary'><span title='Export to PDF'  class='glyphicon glyphicon-print'></span></a>";
 }elseif($controller=="show_all_users_paginated"){
-echo "<a href='".base_url()."UserAdmin/show_all_active_users_paginated/0/0/".$per_page."/0' class='btn btn-warning'>Hide Inactive</a>";
+echo "<a href='".base_url()."UserAdmin/show_all_active_users_paginated/0/0/".$per_page."/0' class='btn btn-warning'><span title='Hide Inactive' class='glyphicon glyphicon-eye-open'></span></a> ";
+echo "<a href='".base_url()."UserAdmin/".$controller."/".$sort_by."/999999/0/0' class='btn btn-primary'><span title='Export to PDF'  class='glyphicon glyphicon-print'></span></a>";
 }else{ 
-echo "<a href='".base_url()."UserAdmin/show_all_active_users_paginated/0/0/".$per_page."/0' class='btn btn-primary'>Show All</a>"; 
+echo "<a href='".base_url()."UserAdmin/show_all_active_users_paginated/0/0/".$per_page."/0' class='btn btn-primary'><span  title='Show All' class='glyphicon glyphicon-eye-close'></span></a> "; 
+echo "<a href='".base_url()."UserAdmin/".$controller."/".$sort_by."/999999/0/0' class='btn btn-primary'><span title='Export to PDF'  class='glyphicon glyphicon-print'></span></a>";
 }
 echo"</div> <!--submenu-->";
 
