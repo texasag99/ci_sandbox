@@ -57,8 +57,14 @@ $permission = array();
 	  </ul>
 	  <?php }else{ echo "  ";}?>		 
 	  <ul class="nav navbar-nav navbar-right">
-			 <?php if ($this->session->userdata('is_logged_in')){ 
-				echo"<li><a href='".base_url()."Profile'>".$this->session->userdata('name')."</a></li>";
+			 <?php if ($this->session->userdata('is_logged_in')){
+			 	$profile_pic = $this->session->userdata('profile_pic');			 	 
+				 if(!isset($profile_pic) && empty($profile_pic)) { 
+				 $profile_pic = "<img src='".base_url()."uploads/generic_user.jpg' class='nav_profile_pic'/>"; 
+				 }else{
+				$profile_pic = "<img src='".base_url()."uploads/profile_pics/".$profile_pic."' class='nav_profile_pic'/>";  
+				}
+				echo"<li><a href='".base_url()."Profile'> ".$profile_pic."&nbsp;&nbsp;".$this->session->userdata('name')."</a></li>";
 				echo"<li><a href='".base_url()."User/logout'><span class='glyphicon glyphicon-off'></span> Logout</a></li>";
 				}else{
 				?>

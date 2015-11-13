@@ -229,12 +229,20 @@ background-color:lightgray;
 		float:left;
 		width:70%;	
 	}
+
+.profile_pic{
+	width:60px;
+	height:60px;	
+	}
+
+.nav_profile_pic{
+	width:25px;
+	height:25px;	
+	}
 	
 .search_by{
 		float:right;
-		width:30%;
-		
-		
+		width:30%;	
 		
 		}
 

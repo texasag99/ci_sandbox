@@ -272,17 +272,14 @@ public function getAudit($id){
 public function export_log(){
 	if($this->session->userdata('is_logged_in') && $this->has_permission_to_view()){
 		if($filename = $this->Audit_model->export_log()){
-				$audit = array('primary' => 'AUDT', 'secondary'=>'EXPT', 'status'=>true,  'controller'=>'Audit', 'value'=>"Cleared Log",  'extra_1' =>'successfully exported the audit log', 'extra_2'=>null, 'extra_3'=>null);
- 				$this->Audit_model->log_entry($audit);
-				redirect(APPPATH.'logs/'.$filename); 
+				  break;		 
 			}else{
 					$audit = array('primary' => 'AUDT', 'secondary'=>'EXPT', 'status'=>false,  'controller'=>'Audit', 'value'=>null,  'extra_1' =>'failed to export audit log', 'extra_2'=>null, 'extra_3'=>null);
  					$this->Audit_model->log_entry($audit);
 					$message = "<div class='alert alert-warning'  role='alert'><p><span class='glyphicon glyphicon-exclamation-sign'></span> <strong>Failed!</strong>Failed to export the audit log. Please contact the system administrator.</p></div>";
 					$this->session->set_flashdata('message',$message);
-			 		redirect('Audit');	
+			 		redirect('Audit');
 			}
-			
 		}else{
 		      redirect ('User/restricted');	
 		   }

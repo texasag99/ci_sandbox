@@ -15,10 +15,18 @@ $(document).ready(function() {
 
 <div id="container" class="container-fluid">
 <div id="body">
-<h1><?php echo $page_header; ?> <sup> <span title="Total Record Count" class="label label-info"><?php echo $total_records ?></span></sup></h1>
+<h1><?php echo $page_header; ?> <sup>
+<?php
+if($total_records > 9999) {$indicator = "danger";}elseif($total_records > 999){$indicator = "warning";}else{$indicator = "info";} 
+echo"<span title='Total Record Count' class='label label-$indicator'>$total_records</span></sup>"; 
+?>
+ </h1>
 <div class='submenu' style='width:70%; float:left;'>
-<?php if($allow_edit){
-	echo "<a href='".base_url()."Audit/truncate_log' class='btn btn-default'>Clear Audit Log</a> &nbsp;&nbsp;";
+<?php 
+if(empty($sort_by)){$sort_by = 0;}
+if($allow_edit){
+	echo "<a href='#' id='clear_audit_log' desc='Clear the audit log' class='btn btn-default'>Clear Audit Log</a> &nbsp;&nbsp;";
+	//echo "<a href='".base_url()."Audit/truncate_log' class='btn btn-default'>Clear Audit Log</a> &nbsp;&nbsp;";
 }
 if($controller=="show_audit_paginated"){
 echo "<a href='".base_url()."Audit/show_failed_log_paginated/0/0/".$per_page."/0' class='btn btn-primary'><span title='Hide Success' class='glyphicon glyphicon-eye-open'></span></a>";
@@ -30,7 +38,7 @@ echo "&nbsp;<a href='".base_url()."Audit/".$controller."/".$sort_by."/999999/".$
 echo "<a href='".base_url()."Audit/show_audit_paginated/0/0/".$per_page."/0' class='btn btn-warning'><span title='Show All' class='glyphicon glyphicon-eye-close'></span></a>"; 
 echo "&nbsp;<a href='".base_url()."Audit/".$controller."/".$sort_by."/999999/".$per_page."/0' class='btn btn-primary'><span title='Export to PDF'  class='glyphicon glyphicon-print'></span></a>";
 }
-echo" </div> <!--submenu-->";
+echo" <a href='".base_url()."Audit/export_log' class='btn btn-primary'><span title='Export to CSV' class ='glyphicon glyphicon-export'></span></a></div> <!--submenu-->";
 
 echo "<div class='search_by form-group' style='width:30%; float:right;'>";
 echo form_open('Audit/search_audit');
@@ -158,8 +166,10 @@ echo "<p>$message</p>";
 	foreach ($results as $data){	
 		if ($data->status == 0){
 		   $status = "Failure";
+		   $indicator = "danger";
 		}else{
 			$status= "Success";
+			$indicator = "success";
 			}
 		echo "<tr><td class='primary_column'><a href='#' id='show_audit_".$data->id."'><span class='glyphicon glyphicon-th-list'></span></a>&nbsp;&nbsp;";		
 		echo $data->primary."&nbsp;</td>";
@@ -169,7 +179,7 @@ echo "<p>$message</p>";
 		echo "<td class='user_email_column'>".$user_email."</td>";
 		if (isset($data->ip_address) && !empty($data->ip_address)){ $ip_address = $data->ip_address;  } else { $ip_address = "empty";}	
 		echo"<td class='ip_address_column'>".$ip_address."</td>";
-		echo"<td class='status_column'>".$status."</td>";
+		echo"<td class='status_column'><span class='label label-$indicator'> ".$status."</span></td>";
 		echo"<td class='datetime_column'>".date('m-d-Y H:i:s', strtotime($data->datetime))."</td>";
 		if (isset($data->session_id) && !empty($data->session_id)){ $session_id = $data->session_id;  } else { $session_id = "empty";}
 		$session_id = (strlen($session_id) > 10) ? substr($session_id,0,9).'...' : $session_id ;
@@ -214,7 +224,13 @@ echo "<p>$message</p>";
 	?>
 </tbody>
 </table>
-	<?php if(isset($links)){ 
+	<?php
+												//below is the script for the pop-up dialog box to confirm.
+		echo "<script>$('#clear_audit_log').click(function(){";
+		echo "bootbox.dialog({title:\"Clear Audit Log\", message:\"<p style='text-align:center'>Are you sure?<br>";
+		echo "<br><a class='btn btn-warning' href='".base_url()."Audit/truncate_log'>Clear Audit Log</a></p>\"}); });</script>";
+	
+	 if(isset($links)){ 
 	 echo "<div id='page_links'>".$links."</div>";
 	 ?>
 	    <div class="btn-group pagination_dropdown">

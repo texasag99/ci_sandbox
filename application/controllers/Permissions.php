@@ -25,7 +25,7 @@ public function __construct(){
 }
 
 public function index(){
-		$this-> show_all_permissions_paginated(0, 0);
+		$this-> show_active_permissions_paginated(0, 0);
 	}
 
 /*************HAS PERMISSIONS*********************/
@@ -82,6 +82,7 @@ private function has_permission_to_add(){
 }
 
 /********************PAGINATION SETUP*********************************/
+/*
 private function pagination_setup(){		
 	$default_pagination= $this->Config_model->get_default_pagination();
 	$per_page = ($this->uri->segment(4))? $this->uri->segment(4) : $default_pagination;	
@@ -106,8 +107,178 @@ private function pagination_setup(){
 	$pagination_config["num_tag_close"] = "</li>";
 		$this->pagination->initialize($pagination_config);
 	return $pagination_config;	
+}*/
+
+public function pagination_setup($type){		
+	$default_pagination= $this->Config_model->get_default_pagination();
+	$pagination_config = array();
+	$sort_by = ($this->uri->segment(3))? $this->uri->segment(3) : 0;
+	$per_page = ($this->uri->segment(5))? $this->uri->segment(5) : $default_pagination;	
+	if ($type=='all_permissions'){
+	$per_page = ($this->uri->segment(5))? $this->uri->segment(5) : $default_pagination;
+	$pagination_config["base_url"] = base_url()."Permissions/show_all_permissions_paginated/".$sort_by."/0/".$per_page."/";
+	$pagination_config["total_rows"] = $this->Roles_permissions_model->permissions_record_count();
+	$pagination_config["uri_segment"] = 6;//this is where we determine which row start we are on, also referred to as the start page or record:
+	$pagination_config["per_page"] = $per_page;	
+	}elseif($type=='active_permissions'){
+	$per_page = ($this->uri->segment(5))? $this->uri->segment(5) : $default_pagination;
+	$pagination_config["base_url"] = base_url()."Permissions/show_active_permissions_paginated/".$sort_by."/0/".$per_page."/";
+	$pagination_config["total_rows"] = $this->Roles_permissions_model->active_permissions_record_count();
+	$pagination_config["uri_segment"] = 6;//this is where we determine which row start we are on, also referred to as the start page or record:
+   $pagination_config["per_page"] = $per_page;	
+	}else{//searched users
+		$sort_by = ($this->uri->segment(4))? $this->uri->segment(4) : 0;	
+		$per_page = ($this->uri->segment(6))? $this->uri->segment(6) : $default_pagination;	
+		$pagination_config["base_url"] = base_url()."Permissions/search_permissions_paginated/".$type."/".$sort_by."/0/".$per_page."/";
+		$pagination_config["total_rows"] = $this->Roles_permissions_model->search_permissions_record_count($type);		
+		$pagination_config["uri_segment"] = 7;	//this is where we determine which row start we are on, also referred to as the start page or record:	
+		$pagination_config["per_page"] = $per_page;	
+		}
+	$pagination_config["full_tag_open"] = "<ul class='pagination'>";
+	$pagination_config["full_tag_close"] = "</ul>";
+	$pagination_config["first_tag_open"] = "<li>";
+	$pagination_config["first_tag_close"] = "</li>";
+	$pagination_config["last_tag_open"] = "<li>";
+	$pagination_config["last_tag_close"] = "</li>";
+	$pagination_config["next_tag_open"] = "<li>";
+	$pagination_config["next_tag_close"] = "</li>";
+	$pagination_config["prev_tag_open"] = "<li>";
+	$pagination_config["prev_tag_close"] = "</li>";
+	$pagination_config["cur_tag_open"] = "<li class='active'><a href='#'>";
+	$pagination_config["cur_tag_close"] = "</a></li>";
+	$pagination_config["num_tag_open"] = "<li>";
+	$pagination_config["num_tag_close"] = "</li>";
+	$this->pagination->initialize($pagination_config);
+	return $pagination_config;	
+}	
+
+/*********************SHOW ALL PERMISSIONS***********************************/
+
+public function show_all_permissions_paginated($sort_by, $pagination_config){
+	if ($this->session->userdata('is_logged_in') && $this->has_permission_to_view()){
+		$this->load->helper("url");
+		if (empty($pagination_config) || $pagination_config==0){
+			$pagination_config = $this->pagination_setup('all_permissions');
+		}
+		$page =  ($this->uri->segment(6))? $this->uri->segment(6) : 0;	
+		$data["results"] = $this->Roles_permissions_model->get_all_permissions_paginated($pagination_config["per_page"], $page, $sort_by);
+		$data["categories"] = $this->Roles_permissions_model->get_permission_categories();
+		$data ["links"] = $this->pagination->create_links();
+		$default_pagination= $this->Config_model->get_default_pagination();
+		$view_data['per_page'] = ($this->uri->segment(5))? $this->uri->segment(5) : $default_pagination;	
+		$view_data['total_records'] = $pagination_config['total_rows'];
+		$view_data['controller']="show_all_permissions_paginated";
+	   $view_data['sort_by'] = $this->uri->segment(3); 
+		$view_data['allow_add'] = $this->has_permission_to_add();
+		$view_data['allow_delete'] = $this->has_permission_to_delete();
+		$view_data['allow_edit'] = $this->has_permission_to_edit();
+		$view_data['title']="Permissions";
+		$view_data['page_header']= "All Permissions";
+		$data= array_merge($view_data, $data);
+		$audit = array('primary' => 'PERM', 'secondary'=>'VIEW', 'status'=>true,  'controller'=>'Permissions', 'value'=>null,  'extra_1' =>null, 'extra_2'=>null, 'extra_3'=>null);
+		$this->Audit_model->log_entry($audit);
+		$this->load->view("header",$data);
+		$this->load->view("navbar",$data);
+		$this->load->view("show_all_permissions_view",$data);
+		$this->load->view("footer",$data);				
+			}else{
+		      redirect ('User/restricted');	
+			}
+	} 
+	
+public function show_active_permissions_paginated($sort_by, $pagination_config){
+	if ($this->session->userdata('is_logged_in') && $this->has_permission_to_view()){
+		$this->load->helper("url");
+		if (empty($pagination_config) || $pagination_config==0){
+			$pagination_config = $this->pagination_setup('active_permissions');
+		}
+		$page =  ($this->uri->segment(6))? $this->uri->segment(6) : 0;		
+		$data["results"] = $this->Roles_permissions_model->get_active_permissions_paginated($pagination_config["per_page"], $page, $sort_by);
+		$data["categories"] = $this->Roles_permissions_model->get_permission_categories();		
+		$data ["links"] = $this->pagination->create_links();
+		$default_pagination= $this->Config_model->get_default_pagination();
+		$view_data['per_page'] = ($this->uri->segment(5))? $this->uri->segment(5) : $default_pagination;	
+		$view_data['total_records'] = $pagination_config['total_rows'];
+		$view_data['controller']="show_active_permissions_paginated";
+	   $view_data['sort_by'] = $this->uri->segment(3); 
+		$view_data['allow_add'] = $this->has_permission_to_add();
+		$view_data['allow_delete'] = $this->has_permission_to_delete();
+		$view_data['allow_edit'] = $this->has_permission_to_edit();
+		$view_data['title']="Permissions";
+		$view_data['page_header']= "Active Permissions";
+		$data= array_merge($view_data, $data);
+		$audit = array('primary' => 'PERM', 'secondary'=>'VIEW', 'status'=>true,  'controller'=>'Permissions', 'value'=>null,  'extra_1' =>null, 'extra_2'=>null, 'extra_3'=>null);
+		$this->Audit_model->log_entry($audit);
+		$this->load->view("header",$data);
+		$this->load->view("navbar",$data);
+		$this->load->view("show_all_permissions_view",$data);
+		$this->load->view("footer",$data);				
+			}else{
+		      redirect ('User/restricted');	
+			}
+	} 	
+	
+	public function search_permissions(){
+	if ($this->session->userdata('is_logged_in') && $this->has_permission_to_view()){
+	$audit_value = json_encode($this->input->post());
+	$this->load->library('form_validation');
+	$this->form_validation->set_rules('search_by', 'Search Field', 'required|trim');
+	if ($this->form_validation->run()){
+		$search_by=$this->input->post('search_by');
+		$search_by=trim($search_by);
+		$search_by=strip_tags($search_by,"");
+		$search_by = str_replace('@', '-at-',$search_by);		
+		$search_by = preg_replace('/[^A-Za-z0-9\s.\s-]/','',$search_by); 		
+		redirect('Permissions/search_permissions_paginated/'.$search_by.'/0/0/0/');
+	}else{ //end of section for the forms valid 
+	    $audit = array('primary' => 'PERM', 'secondary'=>'SRCH', 'status'=>false,  'controller'=>'Permissions', 'value'=>$audit_value,  'extra_1' =>'invalid search entry', 'extra_2'=>null, 'extra_3'=>null);
+	 	 $this->Audit_model->log_entry($audit);
+	    $this->index();
+	}}else{//end of section for users properly logged in
+		      redirect ('User/restricted');	
+			}
+	
 }
-/*********************SHOW ALL PERMISSIONS************************************/	
+
+
+public function search_permissions_paginated($search_by,$sort_by, $pagination_config){
+	if ($this->session->userdata('is_logged_in') && $this->has_permission_to_view()){
+		$this->load->helper("url");		
+		if (empty($pagination_config) || $pagination_config==0){
+			$pagination_config = $this->pagination_setup($search_by);
+		}
+		$page = ($this->uri->segment(7))? $this->uri->segment(7) : 0;	
+		$search_by = str_replace('-at-', '@',$search_by);	//this handles the @ symbol when it is passed in the url.
+		$data["results"] = $this->Roles_permissions_model->search_permissions_paginated($pagination_config["per_page"], $page, $sort_by, $search_by);
+		$data ["links"] = $this->pagination->create_links();
+		$data["categories"] = $this->Roles_permissions_model->get_permission_categories();		
+		$search_by = str_replace('@', '-at-',$search_by);	 //this changes the @ symbol back to -at-
+		$data['search_by']=$search_by;
+		$default_pagination= $this->Config_model->get_default_pagination();
+	   $view_data['per_page'] = ($this->uri->segment(6))? $this->uri->segment(6) : $default_pagination;	
+	   $view_data['total_records'] = $pagination_config['total_rows'];
+	   $view_data['sort_by'] = $this->uri->segment(4); 
+		$view_data['title']="Permissions";
+		$view_data['allow_add'] = $this->has_permission_to_add();
+		$view_data['allow_delete'] = $this->has_permission_to_delete();
+		$view_data['allow_edit'] = $this->has_permission_to_edit();
+		$view_data['page_header']= "Permissions Found";
+		$view_data['controller']="search_permissions_paginated/".$search_by;
+		$data= array_merge($view_data, $data);		
+		$audit = array('primary' => 'PERM', 'secondary'=>'SRCH', 'status'=>true,  'controller'=>'Permissions', 'value'=>$search_by,  'extra_1' =>'search permissions paginated', 'extra_2'=>null, 'extra_3'=>null);
+		$this->Audit_model->log_entry($audit);
+		$this->load->view("header",$data);
+		$this->load->view("navbar",$data);
+		$this->load->view("show_all_permissions_view",$data);
+		$this->load->view("footer",$data);
+
+	}else{
+		      redirect ('User/restricted');	
+			}
+	} 	
+
+
+/*********************SHOW ALL PERMISSIONS***********************************
 public function show_all_permissions_paginated($pagination_config){
 	if ($this->session->userdata('is_logged_in') && $this->has_permission_to_view()){
 		$this->load->helper("url");
@@ -116,6 +287,7 @@ public function show_all_permissions_paginated($pagination_config){
 		}
 		$page = ($this->uri->segment(5))? $this->uri->segment(5) : 0;		
 		$data["results"] = $this->Roles_permissions_model->get_all_permissions_paginated($pagination_config["per_page"], $page);
+		$data["categories"] = $this->Roles_permissions_model->get_permission_categories();
 		$data ["links"] = $this->pagination->create_links();
 	  $default_pagination= $this->Config_model->get_default_pagination();
 	  $view_data['per_page'] = ($this->uri->segment(4))? $this->uri->segment(4) : $default_pagination;	
@@ -132,6 +304,27 @@ public function show_all_permissions_paginated($pagination_config){
 		$this->load->view("show_all_permissions_view",$data);
 		$this->load->view("footer",$data);		
 			}else{
+		      redirect ('User/restricted');	
+			}
+	}
+*/
+public function json_backup(){
+	if ($this->session->userdata('is_logged_in') && $this->has_permission_to_edit()){
+		$this->load->helper('file');
+		$data = $this->Roles_permissions_model->get_all_permissions();
+		$data = json_encode($data);
+		$file_path = APPPATH."../json/permissions.json";
+		if (!empty($data) && isset($data)){		
+		if (write_file($file_path, $data)){
+			echo "it worked!";
+		}else{
+			echo "it didn't work";
+			}
+		}
+		else{ 
+		write_file($file_path, 'empty');
+		}
+		}else{
 		      redirect ('User/restricted');	
 			}
 	}

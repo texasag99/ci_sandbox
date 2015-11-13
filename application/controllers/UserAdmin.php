@@ -129,6 +129,11 @@ $pagination_config["per_page"] = $per_page;
 public function show_all_users_paginated($sort_by, $pagination_config){
 	if ($this->session->userdata('is_logged_in') && $this->has_permission_to_view()){
 		$this->load->helper("url");
+		$create_pdf = 0;
+		if($pagination_config==999999){
+			$create_pdf = 1;	
+			$pagination_config=0;	
+		}
 		if (empty($pagination_config) || $pagination_config==0){
 			$pagination_config = $this->pagination_setup('all_users');
 		}
@@ -146,7 +151,7 @@ public function show_all_users_paginated($sort_by, $pagination_config){
 		$view_data['allow_edit'] = $this->has_permission_to_edit();
 		$view_data['page_header']= "All Users";
 		$data= array_merge($view_data, $data);
-		if ($pagination_config == 999999){
+		if ($create_pdf==1){//Print it as a PDF
 		$audit = array('primary' => 'USRA', 'secondary'=>'PDF', 'status'=>true,  'controller'=>'UserAdmin', 'value'=>null,  'extra_1' =>'all users paginated', 'extra_2'=>null, 'extra_3'=>null);
 		$this->Audit_model->log_entry($audit);
 		$this->load->library('Pdf');
@@ -171,6 +176,11 @@ public function show_all_users_paginated($sort_by, $pagination_config){
 public function show_all_active_users_paginated($sort_by, $pagination_config){
 	if ($this->session->userdata('is_logged_in') && $this->has_permission_to_view()){
 		$this->load->helper("url");
+		$create_pdf = 0;
+		if($pagination_config==999999){
+			$create_pdf = 1;	
+			$pagination_config=0;	
+		}
 		if (empty($pagination_config) || $pagination_config==0){
 			$pagination_config = $this->pagination_setup('active_users');
 		}
@@ -188,7 +198,7 @@ public function show_all_active_users_paginated($sort_by, $pagination_config){
 		$view_data['allow_edit'] = $this->has_permission_to_edit();
 		$view_data['page_header']= "All Users";
 		$data= array_merge($view_data, $data);
-		if ($pagination_config == 999999){
+		if ($create_pdf==1){//Print it as a PDF
 		$audit = array('primary' => 'USRA', 'secondary'=>'PDF', 'status'=>true,  'controller'=>'UserAdmin', 'value'=>null,  'extra_1' =>'all users paginated', 'extra_2'=>null, 'extra_3'=>null);
 		$this->Audit_model->log_entry($audit);
 		$this->load->library('Pdf');
@@ -234,6 +244,11 @@ public function search_users(){
 public function search_users_paginated($search_by,$sort_by, $pagination_config){
 	if ($this->session->userdata('is_logged_in') && $this->has_permission_to_view()){
 		$this->load->helper("url");
+		$create_pdf = 0;
+		if($pagination_config==999999){
+			$create_pdf = 1;	
+			$pagination_config=0;	
+		}
 		if (empty($pagination_config) || $pagination_config==0){
 			$pagination_config = $this->pagination_setup($search_by);
 		}
@@ -254,7 +269,7 @@ public function search_users_paginated($search_by,$sort_by, $pagination_config){
 		$view_data['page_header']= "All Users";
 		$view_data['controller']="search_users_paginated/".$search_by;
 		$data= array_merge($view_data, $data);
-		if ($pagination_config == 999999){//Print it as a PDF
+		if ($create_pdf==1){//Print it as a PDF
 		$audit = array('primary' => 'USRA', 'secondary'=>'PDF', 'status'=>true,  'controller'=>'UserAdmin', 'value'=>null,  'extra_1' =>'all users paginated', 'extra_2'=>null, 'extra_3'=>null);
 		$this->Audit_model->log_entry($audit);
 		$this->load->library('Pdf');
@@ -383,10 +398,10 @@ public function add_validation(){
 if ($this->session->userdata('is_logged_in') && $this->has_permission_to_add()){
 	$audit_value = json_encode($this->input->post());
 	$this->load->library('form_validation');
-	$this->form_validation->set_rules('first', 'First Name', 'required|trim');
-	$this->form_validation->set_rules('last', 'Last Name', 'required|trim');			
-	$this->form_validation->set_rules('email', 'Email', 'required|trim|valid_email|is_unique[user.email]|is_unique[temp_user.email]');
-	$this->form_validation->set_rules('password', 'Password', 'required|trim');
+	$this->form_validation->set_rules('first', 'First Name', 'required|trim|xss_clean');
+	$this->form_validation->set_rules('last', 'Last Name', 'required|trim|xss_clean');			
+	$this->form_validation->set_rules('email', 'Email', 'required|trim|xss_clean|valid_email|is_unique[user.email]|is_unique[temp_user.email]');
+	$this->form_validation->set_rules('password', 'Password', 'required|trim|min_length[8]');
 	$this->form_validation->set_rules('confirm_password','Confirm Password', 'required|trim|matches[password]');
 	$this->form_validation->set_message('is_unique',"The user email already exists.");
   $this->form_validation->set_rules('zip', 'Zip Code', 'trim|min_length[5]|max_length[10]|xss_clean');
@@ -487,14 +502,14 @@ if ($this->session->userdata('is_logged_in') && $this->has_permission_to_edit())
 	$audit_value = json_encode($this->input->post());
 	$id = $this->input->post('id');
 	$this->load->library('form_validation');
-	$this->form_validation->set_rules('first', 'First Name', 'required|trim');
-	$this->form_validation->set_rules('last', 'Last Name', 'required|trim');			
+	$this->form_validation->set_rules('first', 'First Name', 'required|trim|xss_clean');
+	$this->form_validation->set_rules('last', 'Last Name', 'required|trim|xss_clean');			
    if($this->need_to_validate_email($id)){ //if the email in the post is the same one, then we don't need to validate it.
-	$this->form_validation->set_rules('email', 'Email', 'required|trim|valid_email|is_unique[user.email]|is_unique[temp_user.email]');
+	$this->form_validation->set_rules('email', 'Email', 'required|trim|xss_clean|valid_email|is_unique[user.email]|is_unique[temp_user.email]');
     }
   $pw=$this->input->post('password'); 
   	if(isset($pw) && !empty($pw)){//if nothing was entered into the password field then we don't need to worry about it.
-		$this->form_validation->set_rules('password', 'Password', 'required|trim');
+		$this->form_validation->set_rules('password', 'Password', 'required|trim|min_length[8]');
 	  $this->form_validation->set_rules('confirm_password','Confirm Password', 'required|trim|matches[password]');
 		}
   $this->form_validation->set_message('is_unique',"The user email already exists.");

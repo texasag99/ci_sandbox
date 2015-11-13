@@ -4,6 +4,12 @@ if(ISSET($_SERVER['HTTP_REFERER'])){
 }else{ 
     $go_back_url = base_url().'/User/login';
 }
+
+if(!isset($profile_pic) && empty($profile_pic)) { 
+	$picture = "<img src='".base_url()."uploads/generic_user.jpg' class='profile_pic'/>"; 
+}else{
+	$picture = "<img src='".base_url()."uploads/profile_pics/".$profile_pic."' class='profile_pic'/>"; 
+}
 ?>
 <div id="container" class="container-fluid">
 <h1><?php echo $page_header; ?></h1>
@@ -17,6 +23,15 @@ if(ISSET($_SERVER['HTTP_REFERER'])){
 	
 	
 <?php 
+
+echo form_open_multipart('Profile/do_upload');
+echo "<div style='padding:5px; border-radius:5pt; margin-top:5px; border:1px #E5E5E5 solid;'><div style='vertical-align: text-bottom; margin-top:5px; '><label for='profile_pic' >Profile Picture: </label><br/>";
+echo "<sup style='color:gray; font-style: italic;'>All images must be less than 600px by 600px</sup></div><div style='float: left; margin-right:0 auto; '>".$picture."</div>";
+echo "<div style='float:right; text-align:right; width:420px; height:60px; background-color:#E5E5E5'><input type='file' style='border: none !important;' name='profile_pic' value='".$profile_pic."' size='200'/>";
+echo '<button type="submit" value="upload" style="font-size:.85em;"><strong>Upload</strong></button></div><br/><br/><br/><br/></div>';
+echo form_close();
+
+echo "<br/>";
 echo form_open('Profile/profile_validation');
 echo '<div class="warning" style="color:red;">'.validation_errors().'</div>';
 

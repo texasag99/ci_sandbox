@@ -42,8 +42,10 @@ $(function(){
 <body>
 <div id='message'>
 <?php
+if (RESPONSE_TIME_ENABLED){
 $this->benchmark->mark('code_end');
 echo "<div class='elapsed'>".$this->benchmark->elapsed_time('code_start','code_end')." seconds elapsed.</div>";		
+}
 ?>
 
 <?php

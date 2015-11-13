@@ -67,6 +67,43 @@ public function show_configuration(){
 	   }
 }
 
+public function restore_default(){
+	if ($this->session->userdata('is_logged_in') && $this->has_permission_to_edit()){
+       if($this->Config_model->restore_default_settings()){
+       	$audit = array('primary' => 'CNFG', 'secondary'=>'DFLT', 'status'=>true,  'controller'=>'Config', 'value'=>null,  'extra_1' =>'Restored default configuration settings', 'extra_2'=>null, 'extra_3'=>null);
+ 			$this->Audit_model->log_entry($audit);
+			$message = "<div class='alert alert-success'  role='alert'><p><span class='glyphicon glyphicon-ok'></span> <strong>Success!</strong> Application default settings restored.</p></div>";
+			$this->session->set_flashdata('message',$message);
+			 redirect('Config');
+		}else{
+			$audit = array('primary' => 'CNFG', 'secondary'=>'DFLT', 'status'=>false,  'controller'=>'Config', 'value'=>null,  'extra_1' =>'Failed to restore default configuration settings', 'extra_2'=>null, 'extra_3'=>null);
+ 			$this->Audit_model->log_entry($audit);
+			$message = "<div class='alert alert-warning'  role='alert'><p><span class='glyphicon glyphicon-exclamation-sign'></span> <strong>Failed!</strong> Failed to restore application default settings.</p></div>";
+			$this->session->set_flashdata('message',$message);
+			 redirect('Config');    	
+       	}
+		}else{
+		redirect ('User/restricted');	
+	   }
+	}
+
+public function kill_all_sessions(){
+	if ($this->session->userdata('is_logged_in') && $this->has_permission_to_edit()){
+	$userdata = $this->session->all_userdata();
+	foreach($userdata as $key=>$value){
+		$this->session->unset_userdata($key);
+		} 
+	$audit = array('primary' => 'CNFG', 'secondary'=>'KILL', 'status'=>false,  'controller'=>'Config', 'value'=>null,  'extra_1' =>'Killed all active sessions', 'extra_2'=>null, 'extra_3'=>null);
+ 	$this->Audit_model->log_entry($audit);     
+   $this->index();
+   }else{
+		redirect ('User/restricted');	
+	   }
+	}
+
+
+
+
 public function postValue($id, $column){	//FOR INLINE EDITS
   if($this->session->userdata('is_logged_in')){		
 	$this->load->library('form_validation');
@@ -76,8 +113,7 @@ public function postValue($id, $column){	//FOR INLINE EDITS
 	if($column=='default_pagination'){$this->form_validation->set_rules('value', 'Default Pagination', 'required|trim');}
 	if($column=='reset_pwd_days'){$this->form_validation->set_rules('value', 'Days to Require Password Change', 'required|trim|less_than[731]|greater_than[-1]');}
 	if($column=='allow_registration'){$this->form_validation->set_rules('value', 'Allow Open Registration', 'required|trim');}
-  if ($this->form_validation->run() && $this->has_permission_to_edit()){ 
-  
+  if ($this->form_validation->run() && $this->has_permission_to_edit()){   
 		if($column=='from_email'){$data = array('from_email'=>$this->input->post('value')); }
 		if($column=='from_name'){$data = array('from_name'=>$this->input->post('value'));}
 		if($column=='retry_limit'){$data = array('retry_limit'=>$this->input->post('value'));}

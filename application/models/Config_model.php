@@ -25,6 +25,23 @@ public function get_all_settings(){
 		return false;	
 	}
 
+public function restore_default_settings(){
+		$data = array(
+			'from_email'=>null,
+			'from_name'=>'Webmaster',
+			'retry_limit'=>5,
+			'default_pagination'=>10,
+			'reset_pwd_days'=>30,
+			'allow_registration'=>0			
+		);		
+		$this->db->update('config', $data);
+         if($this->db->affected_rows() > 0){
+	         return true;
+	         }else{
+				return false;         
+	         }
+	}
+
 
 public function update_config($id,$data)	{
 	  $this->db->where ('Id',$id);

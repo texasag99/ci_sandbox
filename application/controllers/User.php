@@ -64,6 +64,7 @@ public function login_validation(){
 		if($this->form_validation->run())	{			   
 			   $user_data = $this->User_model->get_user_data($this->input->post('email'));			   
 			   $permissions = $user_data['permissions'];
+			   $profile_pic = $user_data['profile_pic'];
 			   $pwd_last_updated = $user_data['pwd_last_updated'];
 			   $name = $user_data['first'].' '.$user_data['last'];
 			   if($this->pwd_needs_to_change($pwd_last_updated)){			   
@@ -72,7 +73,8 @@ public function login_validation(){
 						'is_logged_in' => 0,
 						'requires_pwd_change' => 1,
 						'name' => $name,
-						'permissions' => $permissions			
+						'permissions' => $permissions,						
+						'profile_pic' => $profile_pic			
 				);
 			  $this->session->set_userdata($data);
 			  $this->change_password();
@@ -82,7 +84,8 @@ public function login_validation(){
 						'is_logged_in' => 1,
 						'requires_pwd_change' => 0,
 						'name' => $name,
-						'permissions' => $permissions			
+						'permissions' => $permissions,
+						'profile_pic' => $profile_pic					
 				);
 			  $this->session->set_userdata($data);
 			  $audit = array('primary' => 'USER', 'secondary'=>'LOGN', 'status'=>true,  'controller'=>'User', 'value'=>null,  'extra_1' =>null, 'extra_2'=>null, 'extra_3'=>null);
@@ -117,10 +120,10 @@ public function registration(){
 public function registration_validation(){
 	if($this->allow_registration()){
 			$this->load->library('form_validation');
-			$this->form_validation->set_rules('first', 'First Name', 'required|trim');
-			$this->form_validation->set_rules('last', 'Last Name', 'required|trim');			
-			$this->form_validation->set_rules('email', 'Email', 'required|trim|valid_email|is_unique[user.email]|is_unique[temp_user.email]');
-			$this->form_validation->set_rules('password', 'Password', 'required|trim');
+			$this->form_validation->set_rules('first', 'First Name', 'required|trim|xss_clean');
+			$this->form_validation->set_rules('last', 'Last Name', 'required|trim|xss_clean');			
+			$this->form_validation->set_rules('email', 'Email', 'required|trim|xss_clean|valid_email|is_unique[user.email]|is_unique[temp_user.email]');
+			$this->form_validation->set_rules('password', 'Password', 'required|trim|min_length[8]');
 			$this->form_validation->set_rules('confirm_password','Confirm Password', 'required|trim|matches[password]');
 			$this->form_validation->set_message('is_unique',"The user email already exists.");
 			if ($this->form_validation->run()){
@@ -341,7 +344,7 @@ public function fmp_password_validation(){
 			$key = $this->input->post('key');
 			$this->load->library('form_validation');		
 			$this->form_validation->set_rules('key', 'Key', 'required|trim');
-			$this->form_validation->set_rules('password', 'Password', 'required|trim');
+			$this->form_validation->set_rules('password', 'Password', 'required|trim|min_length[8]');
 			$this->form_validation->set_rules('confirm_password','Confirm Password', 'required|trim|matches[password]');
 			if ($this->form_validation->run()){							
 						$audit = array('primary' => 'USER', 'secondary'=>'FMPC', 'status'=>true,  'controller'=>'User', 'value'=>$audit_value,  'extra_1' =>'(fmp) password successfully changed', 'extra_2'=>null, 'extra_3'=>null);

@@ -1,8 +1,14 @@
 <?php
+
 if(ISSET($_SERVER['HTTP_REFERER'])){
 	$go_back_url = $_SERVER['HTTP_REFERER'];
 }else{ 
     $go_back_url = base_url().'/User/login';
+}
+if(!isset($profile_pic) && empty($profile_pic)) { 
+$profile_pic = "<img src='".base_url()."uploads/generic_user.jpg' class='profile_pic'/>"; 
+}else{
+	$profile_pic = "<img src='".base_url()."uploads/profile_pics/".$profile_pic."' class='profile_pic'/>";  
 }
 ?>
 
@@ -24,6 +30,7 @@ if(ISSET($_SERVER['HTTP_REFERER'])){
 <th>Profile Data</th>
 </tr></thead>
 <tbody class="table-hover">
+<tr><td></td><td><?php echo $profile_pic; ?></td></tr>
 <tr><td class='text-right'>Email:</td><td>&nbsp;<?php echo $email; ?><td></tr>
 <tr><td class='text-right'>Name:</td><td>&nbsp;<?php echo $first." ".$last; ?><td></tr>
 <tr><td class='text-right'>Address:</td><td>&nbsp;<?php echo $address1; ?><td></tr>

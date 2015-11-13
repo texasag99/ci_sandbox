@@ -155,19 +155,25 @@ public function  search_audit_paginated($limit, $start, $sort_by, $search_by){
 	
 public function export_log(){
 	$this->load->helper('file');
+	$this->load->helper('download');
 	$this->db->order_by("datetime","desc");	
 	$query = $this->db->get('audit');
 	$datestamp= date("Y-m-d-H:i:s");	
-	$audit_file = "Audit file created on : ".$datestamp."\n\n";
+	$audit_file = "Audit file created on : ".$datestamp."\n";
+	$audit_file .= "Date-time|ID|Pri|Sec|Email|IP_Address|Status|Session_ID|URI|Value|Controller|HTTP_Agent|HTTP_Host_Data|Environmentals|Extra_1|Extra_2|Extra_3\n";
 	foreach($query->result() as $row){
- 		$audit_file .= $row->datetime."| ".$row->id."|".$row->primary."|".$row->secondary."|".$row->user_email."|".$row->ip_address."|".$row->status."|".$row->session_id."|".$row->uri." |";
+ 		$audit_file .= $row->datetime."|".$row->id."|".$row->primary."|".$row->secondary."|".$row->user_email."|".$row->ip_address."|".$row->status."|".$row->session_id."|".$row->uri."|";
  		$audit_file .= $row->value."|".$row->controller."|".$row->http_agent."|".$row->http_host_data."|".$row->environmentals."|".$row->extra_1."|".$row->extra_2."|".$row->extra_3."\n"; 
  	    }	
- 	if(write_file('/var/www/CodeIgniter/application/logs/audit-'.$datestamp.'.csv', $audit_file)){ 
+ 	 $file_path = APPPATH."logs/audit-".$datestamp.".csv";
+ 	if(write_file($file_path, $audit_file)){ 
  	 $filename = "audit-".$datestamp.'.csv';
- 	 return $filename;
+ 	 $audit = array('primary' => 'AUDT', 'secondary'=>'EXPT', 'status'=>true,  'controller'=>'Audit', 'value'=>null,  'extra_1' =>'successfully exported the audit log', 'extra_2'=>null, 'extra_3'=>null);
+ 	 $this->log_entry($audit);		
+ 	 force_download($filename , $audit_file);
+ 	 return true;
  	 }else{
-	return false; 	 
+	 return false; 	 
  	 }
  }
 
@@ -180,8 +186,9 @@ public function truncate_log(){
 	foreach($query->result() as $row){
  		$audit_file .= $row->datetime."| ".$row->id."| ".$row->primary."| ".$row->secondary."| ".$row->user_email."| ".$row->ip_address."| ".$row->status."| ".$row->session_id."| ".$row->uri."\n";
  		$audit_file .= "            ".$row->value."| ".$row->controller."| ".$row->http_agent."| ".$row->http_host_data."| ".$row->environmentals."| ".$row->extra_1."| ".$row->extra_2."| ".$row->extra_3."\n"; 
- 	    }	
- 	if(write_file('/var/www/CodeIgniter/application/logs/audit-'.$datestamp.'.csv', $audit_file)){ 
+ 	    }
+ 	$file_path = APPPATH."logs/audit-".$datestamp.".csv";	
+ 	if(write_file($file_path, $audit_file)){ 
 	if($this->db->empty_table('audit')){
 		return true;
 	}else{

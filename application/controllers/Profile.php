@@ -78,8 +78,56 @@ public function edit_profile(){
 		      redirect ('User/restricted');	
 			}
 	} 	
+
+public function do_upload() {
+	if ($this->session->userdata('is_logged_in')){
+	$email = $this->session->userdata('email');
+	$user_data = $this->User_model->get_user_data($email);
+	$id = $user_data['id'];
+	$value = json_encode($this->input->post());
+	$file_path = APPPATH."../uploads/profile_pics/";
+	//$file_path = "/var/www/CodeIgniter/uploads/profile_pics";
+	$config = array(
+		'allowed_types' => 'jpg|jpeg|gif|png',
+		'upload_path' => $file_path,
+		'max_size' => 500,
+		'max_width' => 600,
+		'max_height' => 600,
+		'overwrite' => true
+	);	
+	$this->load->library('upload',$config);
+	if($this->upload->do_upload('profile_pic')){		
+	 	$image_data = $this->upload->data();
+	 	$data['profile_pic'] = $image_data['file_name'];
+	 	if($this->User_model->update_profile_pic($id, $data)){	 	
+		$audit = array('primary' => 'PROF', 'secondary'=>'PIC', 'status'=>true,  'controller'=>'Profile', 'value'=>$value,  'extra_1' =>'added a profile picture', 'extra_2'=>null, 'extra_3'=>null);
+	 	$this->Audit_model->log_entry($audit);	 	
+	 	$message = "<div class='alert alert-success' role='alert'><span class='glyphicon glyphicon-ok'></span> <strong>Success!</strong> Profile picture successfully updated.</div>";
+		$this->session->set_flashdata('message',$message);
+		redirect('Profile/edit_profile');	 
+		}	else{
+			$audit = array('primary' => 'PROF', 'secondary'=>'PIC', 'status'=>false,  'controller'=>'Profile', 'value'=>$value,  'extra_1' =>'failed to update the database', 'extra_2'=>null, 'extra_3'=>null);
+	 	$this->Audit_model->log_entry($audit);	 	
+	 	$message = "<div class='alert alert-warning' role='alert'><span class='glyphicon glyphicon-exclamation-sign'></span><strong>Failed!</strong> Profile pic update failed to update the database.</div>";
+		$this->session->set_flashdata('message',$message);
+		redirect('Profile/edit_profile');				
+			}
+	 	}else{
+	 		$audit = array('primary' => 'PROF', 'secondary'=>'PIC', 'status'=>false,  'controller'=>'Profile', 'value'=>$value,  'extra_1' =>'failed to add profile picture', 'extra_2'=>null, 'extra_3'=>null);
+	 		$this->Audit_model->log_entry($audit);
+	 		$error = $this->upload->display_errors();
+			$message = "<div class='alert alert-warning' role='alert'><span class='glyphicon glyphicon-exclamation-sign'></span> <strong>Problem!</strong> Profile picture was NOT updated.";
+			$message .="<strong>Error:</strong>".$error."</div>";
+			$this->session->set_flashdata('message',$message);
+			redirect('Profile/edit_profile');
+			}
+	 }else{
+		      redirect ('User/restricted');	
+			}
+	}
+	
 public function profile_validation(){
-			$audit_value = json_encode($this->input->post());
+			$audit_value = json_encode($this->input->post());					
 			$this->load->library('form_validation');
 			$this->form_validation->set_rules('first', 'First Name', 'required|trim');
 			$this->form_validation->set_rules('last', 'Last Name', 'required|trim');	

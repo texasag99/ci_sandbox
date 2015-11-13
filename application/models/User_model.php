@@ -336,6 +336,8 @@ public function get_user_data($email){
  }
  $id = $user_data['id'];
  $user_data['permissions'] = $this->get_user_permissions($id);
+ $user_profile = $this->get_user_profile($id);
+ $user_data['profile_pic'] = $user_profile['profile_pic'];
  return $user_data;
  }
  
@@ -371,6 +373,7 @@ public function get_user_data($email){
        $profile_data['profile_updated'] = $row->last_updated;
        $profile_data['email2'] = $row->email2;
        $profile_data['fax'] = $row->fax;
+       $profile_data['profile_pic'] = $row->profile_pic;
        $profile_data['mobile'] = $row->mobile;
 		 $profile_data['tel'] = $row->tel;
 		 $profile_data['website'] = $row->website; 	
@@ -400,6 +403,7 @@ public function update_user_data(){
 
 public function update_user_value($data, $id){
 			$this->db->where('id', $id);
+			$data['last_updated'] = date("Y-m-d H:i:s");
 			$this->db->update('user', $data);
          if($this->db->affected_rows() > 0){
 	         return true;
@@ -419,6 +423,17 @@ public function create_new_profile($id){
 			return false;         
 			}
 	}
+
+public function update_profile_pic($id, $data){
+			$this->db->where('user_id', $id);
+			$data['last_updated'] = date("Y-m-d H:i:s");
+       	$this->db->update('user_profile', $data);
+         if($this->db->affected_rows() > 0){
+	         return true;
+	         }else{
+				return false;         
+	         }
+	}
 	
 public function update_user_profile($id){
 			$profile_data = array(
@@ -437,7 +452,7 @@ public function update_user_profile($id){
 								'last_updated'=>date("Y-m-d H:i:s")
 			);			
 			$this->db->where('user_id', $id);
-       $this->db->update('user_profile', $profile_data);
+       	$this->db->update('user_profile', $profile_data);
          if($this->db->affected_rows() > 0){
 	         return true;
 	         }else{
