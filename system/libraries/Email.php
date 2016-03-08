@@ -44,7 +44,7 @@ class CI_Email {
 	 *
 	 * @var	string
 	 */
-	public $useragent	= 'CodeIgniter';
+	public $useragent	= 'Pricebook';
 
 	/**
 	 * Path to the Sendmail binary.
@@ -65,21 +65,21 @@ class CI_Email {
 	 *
 	 * @var	string
 	 */
-	public $smtp_host	= 'smtp.gmail.com';
+	public $smtp_host	= '';
 
 	/**
 	 * SMTP Username
 	 *
 	 * @var	string
 	 */
-	public $smtp_user	= 'bejan.nouri@gmail.com';
+	public $smtp_user	= '';
 
 	/**
 	 * SMTP Password
 	 *
 	 * @var	string
 	 */
-	public $smtp_pass	= 'piak2hz3';
+	public $smtp_pass	= '';
 
 	/**
 	 * SMTP Server port

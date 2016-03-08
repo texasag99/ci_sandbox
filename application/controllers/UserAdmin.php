@@ -376,7 +376,7 @@ if ($this->session->userdata('is_logged_in') && $this->has_permission_to_add()){
 }
 
 protected function send_user_email($email, $subject, $message){
-						$this->load->library('email');
+						$this->Config_model->initialize_email_settings();
 						$from_email = $this->Config_model->get_from_email();
 						$from_name = $this->Config_model->get_from_name();
 						$this->email->from($from_email, $from_name);

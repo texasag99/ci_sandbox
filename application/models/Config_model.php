@@ -7,6 +7,33 @@
  * */
 
 class Config_model extends CI_Model {
+	
+public function initialize_email_settings(){
+	$this->load->library('email');
+	$query = $this->db->get("config");
+		if ($query->num_rows() > 0) {
+			foreach($query->result() as $row){
+				 		$data['mail_path']= $row->mail_path;
+				 		$data['mail_protocol']= $row->mail_protocol;
+				 		$data['smtp_host']= $row->smtp_host;
+				 		$data['smtp_user']= $row->smtp_user;
+				 		$data['smtp_pass']= $row->smtp_pass;
+				 		$data['smtp_port']= $row->smtp_port;
+				 		}
+				$config['protocol'] = $data['mail_protocol'];
+				$config['mailpath'] = $data['mail_path'];
+				$config['smtp_host'] = $data['smtp_host'];
+				$config['smtp_user'] = $data['smtp_user'];
+				$config['smtp_pass'] = $data['smtp_pass'];
+				$config['smtp_port'] = $data['smtp_port'];
+				if($this->email->initialize($config)){
+					return true;
+					}else{
+						echo "<h2 class='warning'>EMAIL SETTINGS FAILED TO INITIALIZE! </h2>";
+						return false; 
+						}
+		}	
+	}
 
 
 public function get_all_settings(){
@@ -19,6 +46,12 @@ public function get_all_settings(){
 				 		$data['default_pagination']= $row->default_pagination;
 				 		$data['reset_pwd_days']= $row->reset_pwd_days;
 				 		$data['allow_registration']= $row->allow_registration;
+				 		$data['mail_path']= $row->mail_path;
+				 		$data['mail_protocol']= $row->mail_protocol;
+				 		$data['smtp_host']= $row->smtp_host;
+				 		$data['smtp_user']= $row->smtp_user;
+				 		$data['smtp_pass']= $row->smtp_pass;
+				 		$data['smtp_port']= $row->smtp_port;
 				 		}
 			return $data;
 		}

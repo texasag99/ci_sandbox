@@ -109,13 +109,26 @@ public function postValue($id, $column){	//FOR INLINE EDITS
 	$this->load->library('form_validation');
 	if($column=='from_email'){$this->form_validation->set_rules('value', 'Administrator Email', 'required|trim|valid_email');}
 	if($column=='from_name'){$this->form_validation->set_rules('value', 'Administrator Name or Title', 'required|max_length[100]|trim');}
+	if($column=='mail_path'){$this->form_validation->set_rules('value', 'Mail Path', 'required|max_length[100]|trim');}
+	if($column=='mail_protocol'){$this->form_validation->set_rules('value', 'Mail Protocol', 'required|max_length[100]|trim');}
+	if($column=='smtp_host'){$this->form_validation->set_rules('value', 'SMTP Host or URL', 'required|max_length[100]|trim');}
+	if($column=='smtp_user'){$this->form_validation->set_rules('value', 'SMTP User Name', 'required|max_length[100]|trim');}
+	if($column=='smtp_pass'){$this->form_validation->set_rules('value', 'SMTP User Password', 'required|max_length[100]|trim');}
+	if($column=='smtp_port'){$this->form_validation->set_rules('value', 'SMTP Port', 'required|max_length[100]|trim');}
 	if($column=='retry_limit'){$this->form_validation->set_rules('value', 'Password Retry Limit', 'required|trim');}
 	if($column=='default_pagination'){$this->form_validation->set_rules('value', 'Default Pagination', 'required|trim');}
 	if($column=='reset_pwd_days'){$this->form_validation->set_rules('value', 'Days to Require Password Change', 'required|trim|less_than[731]|greater_than[-1]');}
 	if($column=='allow_registration'){$this->form_validation->set_rules('value', 'Allow Open Registration', 'required|trim');}
+	
   if ($this->form_validation->run() && $this->has_permission_to_edit()){   
 		if($column=='from_email'){$data = array('from_email'=>$this->input->post('value')); }
 		if($column=='from_name'){$data = array('from_name'=>$this->input->post('value'));}
+		if($column=='mail_path'){$data = array('mail_path'=>$this->input->post('value'));}
+		if($column=='mail_protocol'){$data = array('mail_protocol'=>$this->input->post('value'));}
+		if($column=='smtp_host'){$data = array('smtp_host'=>$this->input->post('value'));}
+		if($column=='smtp_user'){$data = array('smtp_user'=>$this->input->post('value'));}
+		if($column=='smtp_pass'){$data = array('smtp_pass'=>$this->input->post('value'));}				
+		if($column=='smtp_port'){$data = array('smtp_port'=>$this->input->post('value'));}	
 		if($column=='retry_limit'){$data = array('retry_limit'=>$this->input->post('value'));}
 		if($column=='default_pagination'){$data = array('default_pagination'=>$this->input->post('value'));}
 		if($column=='reset_pwd_days'){$data = array('reset_pwd_days'=>$this->input->post('value'));}
