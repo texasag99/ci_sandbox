@@ -36,6 +36,36 @@ Setting Value
 		if($allow_edit){ echo"<a href='#' class='editable' id='from_name' data-type='text' name='from_name' data-url='".base_url()."Config/postValue/1/from_name' data-pk='1' data-title='Enter the administrator name or title'>".$results['from_name']."</a></td></tr>";
 		}else{ 
 		echo $results['from_name']."</td></tr>";}
+		echo "<tr><td class='setting align_right'><strong>Mail Path:</strong><br>This is the file path location for the sendmail functionality loaded on the server</td>";
+		echo "<td class='setting_value'>";
+		if($allow_edit){echo"<a href='#' class='editable' id='mail_pathl' data-type='text' name='mail_path' data-url='".base_url()."Config/postValue/1/mail_path' data-pk='1' data-title='Enter the mail path'>".$results['mail_path']."</a></td></tr>";
+		}else{ 
+		echo $results['mail_path']."</td></tr>";}	
+		echo "<tr><td class='setting align_right'><strong>Mail Protocol:</strong><br>This is the mail protocol (e.g. mail, sendmail, or smtp) for the sendmail functionality loaded on the server</td>";
+		echo "<td class='setting_value'>";
+		if($allow_edit){echo"<a href='#' class='editable' id='mail_protocol' data-type='text' name='mail_protocol' data-url='".base_url()."Config/postValue/1/mail_protocol' data-pk='1' data-title='Enter the mail protocol (mail, sendmail, or smtp)'>".$results['mail_protocol']."</a></td></tr>";
+		}else{ 
+		echo $results['mail_protocol']."</td></tr>";}	
+		echo "<tr><td class='setting align_right'><strong>SMTP Host:</strong><br>This is the url or server location for the SMTP server used to send the emails.</td>";
+		echo "<td class='setting_value'>";
+		if($allow_edit){echo"<a href='#' class='editable' id='smtp_host' data-type='text' name='smtp_host' data-url='".base_url()."Config/postValue/1/smtp_host' data-pk='1' data-title='Enter the smtp host address'>".$results['smtp_host']."</a></td></tr>";
+		}else{ 
+		echo $results['smtp_host']."</td></tr>";}
+		echo "<tr><td class='setting align_right'><strong>SMTP User:</strong><br>This is the username defined to send the mail using the SMTP server.</td>";
+		echo "<td class='setting_value'>";
+		if($allow_edit){echo"<a href='#' class='editable' id='smtp_user' data-type='text' name='smtp_user' data-url='".base_url()."Config/postValue/1/smtp_user' data-pk='1' data-title='Enter the smtp user name'>".$results['smtp_user']."</a></td></tr>";
+		}else{ 
+		echo $results['smtp_user']."</td></tr>";}	
+		echo "<tr><td class='setting align_right'><strong>SMTP Password:</strong><br>This is the SMTP user password needed to send the mail using the SMTP server.</td>";
+		echo "<td class='setting_value'>";
+		if($allow_edit){echo"<a href='#' class='editable' id='smtp_pass' data-type='text' name='smtp_pass' data-url='".base_url()."Config/postValue/1/smtp_pass' data-pk='1' data-title='Enter the smtp password'>".$results['smtp_pass']."</a></td></tr>";
+		}else{ 
+		echo $results['smtp_pass']."</td></tr>";}
+		echo "<tr><td class='setting align_right'><strong>SMTP Port:</strong><br>This is the SMTP port needed to send the email using the SMTP server</td>";
+		echo "<td class='setting_value'>";
+		if($allow_edit){echo"<a href='#' class='editable' id='smtp_port' data-type='text' name='smtp_port' data-url='".base_url()."Config/postValue/1/smtp_port' data-pk='1' data-title='Enter the smtp port number'>".$results['smtp_port']."</a></td></tr>";
+		}else{ 
+		echo $results['smtp_port']."</td></tr>";}			
 		echo "<tr><td class='setting align_right'><strong>Password Retry Limit:</strong><br>The number of allowed password retries. Once exceeded the user's account is locked. </td>";
 		echo "<td class='setting_value'>";
 		if($allow_edit){echo"<a href='#' class='editable' id='retry_limit' data-type='text' name='retry_limit' data-url='".base_url()."Config/postValue/1/retry_limit' data-pk='1' data-title='Enter a limit'>".$results['retry_limit']."</a></td></tr>";

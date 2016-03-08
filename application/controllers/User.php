@@ -135,7 +135,8 @@ public function registration_validation(){
 					    //generate a random key
 						$key = md5(uniqid());
 						   //add the user info to the db, build the email and send and email to the new user
-						$this->load->library('email');
+						//$this->load->library('email');
+						$this->Config_model->initialize_email_settings();
 						$from_email = $this->Config_model->get_from_email();
 						$from_name = $this->Config_model->get_from_name();
 						$this->email->from($from_email, $from_name);
@@ -257,7 +258,8 @@ public function fmp_email_validation(){
 				//generate a random key
 						$key = md5(uniqid());
 						   //add the user info to the db, build the email and send and email to the new user
-						$this->load->library('email');
+						//$this->load->library('email');
+						$this->Config_model->initialize_email_settings();
 						$from_email = $this->Config_model->get_from_email();
 						$from_name = $this->Config_model->get_from_name();
 						$this->email->from($from_email, $from_name);
@@ -349,7 +351,8 @@ public function fmp_password_validation(){
 			if ($this->form_validation->run()){							
 						$audit = array('primary' => 'USER', 'secondary'=>'FMPC', 'status'=>true,  'controller'=>'User', 'value'=>$audit_value,  'extra_1' =>'(fmp) password successfully changed', 'extra_2'=>null, 'extra_3'=>null);
 						$this->Audit_model->log_entry($audit);
-						$this->load->library('email');
+						//$this->load->library('email');
+						$this->Config_model->initialize_email_settings();
 						$from_email = $this->Config_model->get_from_email();
 						$from_name = $this->Config_model->get_from_name();
 						$this->email->from($from_email, $from_name);
@@ -428,7 +431,8 @@ public function password_validation(){
 		    //generate a random key
 				$key = md5(uniqid());
 				//add the user info to the db, build the email and send and email to the new user
-				$this->load->library('email');
+				//$this->load->library('email');
+				$this->Config_model->initialize_email_settings();
 				$from_email = $this->Config_model->get_from_email();
 				$from_name = $this->Config_model->get_from_name();
 				$this->email->from($from_email, $from_name);
